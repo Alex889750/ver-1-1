@@ -67,7 +67,7 @@ const SettingsPanel = ({
   };
 
   const handleSignalThresholdChange = (e) => {
-    const value = Math.max(0.01, Math.min(30, parseFloat(e.target.value) || 1.01));
+    const value = Math.max(1.0, Math.min(50, parseFloat(e.target.value) || 3.0));
     onSettingsChange({
       ...settings,
       signalThreshold: value
