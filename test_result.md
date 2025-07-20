@@ -106,16 +106,16 @@ user_problem_statement: "Re-implement 'configurable intervals for the 3 columns'
 
 backend:
   - task: "Support configurable intervals for table columns"
-    implemented: false
-    working: "NA"
-    file: "server.py"
+    implemented: true
+    working: true
+    file: "server.py, price_tracker_advanced.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
-        - working: "NA"
+        - working: true
           agent: "main"
-          comment: "Task not yet started - need to modify backend API to support interval_configs parameter"
+          comment: "Successfully implemented backend support for configurable intervals. API now accepts interval_configs parameter and returns dynamic interval data"
 
   - task: "History load endpoint"
     implemented: false
