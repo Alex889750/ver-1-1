@@ -163,37 +163,52 @@ const CompactCryptoScreener = () => {
       // Получаем свечи для расчета (используем 1-минутные свечи)
       const candles = tickerData.candles?.filter(candle => candle.timeframe === '1m') || [];
       
-      if (candles.length >= settings.signalCandlesCount) {
+      if (candles.length >= settings.signalCandlesCount + 1) {
         // Сортируем свечи по времени (последние сначала)
         const sortedCandles = candles.sort((a, b) => b.timestamp - a.timestamp);
         
-        // Берем последнюю закрытую свечу
+        // Последняя свеча (за последнюю минуту)
         const latestCandle = sortedCandles[0];
-        const currentClose = latestCandle.close;
+        const previousCandle = sortedCandles[1];
         
-        // Берем предыдущие N свечей для расчета среднего
-        const previousCandles = sortedCandles.slice(1, settings.signalCandlesCount + 1);
+        // Процентное изменение за последнюю минуту
+        const lastMinuteChange = ((latestCandle.close - previousCandle.close) / previousCandle.close) * 100;
         
-        if (previousCandles.length === settings.signalCandlesCount) {
-          // Рассчитываем среднее значение
-          const averageClose = previousCandles.reduce((sum, candle) => sum + candle.close, 0) / previousCandles.length;
+        // Берем предыдущие N свечей для расчета среднего изменения
+        const historicalCandles = sortedCandles.slice(1, settings.signalCandlesCount + 1);
+        
+        if (historicalCandles.length === settings.signalCandlesCount && Math.abs(lastMinuteChange) > 0.001) {
+          // Рассчитываем среднее процентное изменение за предыдущие N минут
+          let totalPercentChange = 0;
+          for (let i = 0; i < historicalCandles.length - 1; i++) {
+            const current = historicalCandles[i];
+            const previous = historicalCandles[i + 1];
+            const percentChange = ((current.close - previous.close) / previous.close) * 100;
+            totalPercentChange += percentChange;
+          }
           
-          // Рассчитываем отношение
-          const ratio = currentClose / averageClose;
+          const averagePercentChange = totalPercentChange / (historicalCandles.length - 1);
           
-          // Проверяем превышение порога
-          if (ratio >= settings.signalThreshold || ratio <= (2 - settings.signalThreshold)) {
-            const isPositive = ratio >= settings.signalThreshold;
-            const signalValue = isPositive ? ratio : (2 - ratio); // Нормализуем для отрицательных сигналов
+          // Избегаем деления на ноль и очень маленькие значения
+          if (Math.abs(averagePercentChange) > 0.01) {
+            // Рассчитываем отношение процентных изменений
+            const ratio = Math.abs(lastMinuteChange) / Math.abs(averagePercentChange);
             
-            newSignals.push({
-              id: `${ticker}-${Date.now()}`,
-              time: currentTime,
-              ticker: ticker,
-              value: signalValue.toFixed(4),
-              isPositive: isPositive,
-              ratio: ratio
-            });
+            // Проверяем превышение порога
+            if (ratio >= settings.signalThreshold) {
+              const isPositive = lastMinuteChange > 0;
+              
+              newSignals.push({
+                id: `${ticker}-${Date.now()}`,
+                time: currentTime,
+                ticker: ticker,
+                value: ratio.toFixed(2),
+                isPositive: isPositive,
+                lastMinuteChange: lastMinuteChange.toFixed(3),
+                averageChange: averagePercentChange.toFixed(3),
+                ratio: ratio
+              });
+            }
           }
         }
       }
