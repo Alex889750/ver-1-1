@@ -68,7 +68,11 @@ class CryptoPrice(BaseModel):
     source: str = "mexc"
     change_15s: Optional[PriceChange] = None
     change_30s: Optional[PriceChange] = None
+    change_interval_0: Optional[PriceChange] = None
+    change_interval_1: Optional[PriceChange] = None
+    change_interval_2: Optional[PriceChange] = None
     candles: List[CandleData] = Field(default_factory=list)
+    interval_configs: List[str] = Field(default_factory=lambda: ["15s", "30s", "24h"])
 
 class CryptoPricesResponse(BaseModel):
     data: Dict[str, CryptoPrice]
