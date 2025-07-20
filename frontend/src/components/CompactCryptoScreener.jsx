@@ -736,16 +736,9 @@ const CompactCryptoScreener = () => {
                             </span>
                           </td>
                           <td className="py-2 px-3">
-                            <div className="flex items-center space-x-2">
-                              <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                                <span className="text-white text-xs font-bold">
-                                  {formatCurrency(signal.ticker).substring(0, 1)}
-                                </span>
-                              </div>
-                              <span className="text-white font-semibold text-sm">
-                                {formatCurrency(signal.ticker)}
-                              </span>
-                            </div>
+                            <span className="text-white font-mono text-sm">
+                              {formatCurrency(signal.ticker)}
+                            </span>
                           </td>
                           <td className="py-2 px-3 text-right">
                             <div className="flex flex-col items-end space-y-1">
