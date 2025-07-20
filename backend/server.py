@@ -272,7 +272,7 @@ async def get_crypto_prices(
                 if search_upper in symbol or search_upper in symbol.replace('USDT', '')
             ]
         
-        # Сортировка (обновленная для новой структуры)
+        # Сортировка (обновленная для поддержки динамических интервалов)
         sort_key_map = {
             "symbol": lambda x: x[1].symbol,
             "price": lambda x: x[1].price,
@@ -281,6 +281,21 @@ async def get_crypto_prices(
             "change_15s": lambda x: x[1].change_15s.percent_change if x[1].change_15s else 0,
             "change_30s": lambda x: x[1].change_30s.percent_change if x[1].change_30s else 0,
         }
+        
+        # Добавляем динамические ключи для всех возможных интервалов
+        interval_seconds_map = {
+            2: "change_2s", 5: "change_5s", 10: "change_10s", 15: "change_15s", 30: "change_30s",
+            60: "change_60s", 120: "change_120s", 180: "change_180s", 300: "change_300s", 
+            600: "change_600s", 900: "change_900s", 1200: "change_1200s", 1800: "change_1800s",
+            3600: "change_3600s", 14400: "change_14400s", 86400: "change_86400s"
+        }
+        
+        for seconds, key in interval_seconds_map.items():
+            sort_key_map[key] = lambda x, s=seconds: (
+                getattr(x[1], f'change_{s}s', {}).get('percent_change', 0) 
+                if hasattr(x[1], f'change_{s}s') and getattr(x[1], f'change_{s}s') 
+                else (x[1].changePercent24h if s == 86400 else 0)
+            )
         
         if sort_by in sort_key_map:
             formatted_data.sort(
