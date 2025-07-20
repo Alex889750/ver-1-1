@@ -31,8 +31,8 @@ const OptimizedCryptoScreener = () => {
   const columns = [
     { key: 'symbol', label: 'Символ', sortable: true },
     { key: 'price', label: 'Цена (USDT)', sortable: true, align: 'right' },
-    { key: 'change_15s', label: '15с', sortable: false, align: 'right' },
-    { key: 'change_30s', label: '30с', sortable: false, align: 'right' },
+    { key: 'change_15s', label: '15с', sortable: true, align: 'right' },
+    { key: 'change_30s', label: '30с', sortable: true, align: 'right' },
     { key: 'change24h', label: '24ч', sortable: true, align: 'right' },
     { key: 'changePercent24h', label: '24ч %', sortable: true, align: 'right' },
     { key: 'volume', label: 'Объем', sortable: true, align: 'right' },
