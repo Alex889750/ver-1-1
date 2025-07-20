@@ -104,7 +104,7 @@ const CompactCryptoScreener = () => {
         key: `change_interval_${index}`,
         label: intervalObj ? intervalObj.label : interval,
         sortable: true,
-        align: 'right',
+        align: 'center',
         width: '80px'
       };
     });
