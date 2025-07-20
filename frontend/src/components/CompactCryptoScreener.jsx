@@ -171,7 +171,7 @@ const CompactCryptoScreener = () => {
         const latestCandle = sortedCandles[0];
         const previousCandle = sortedCandles[1];
         
-        // Изменение цены за последнюю минуту (абсолютное значение)
+        // Изменение цены за последнюю минуту (с учетом знака)
         const lastMinutePriceChange = latestCandle.close - previousCandle.close;
         
         // Берем предыдущие N свечей для расчета среднего изменения
@@ -194,23 +194,32 @@ const CompactCryptoScreener = () => {
           
           // Избегаем деления на ноль и очень маленькие значения
           if (Math.abs(averagePriceChange) > 0.0001) {
-            // Рассчитываем отношение изменений цен
-            const ratio = Math.abs(lastMinutePriceChange) / Math.abs(averagePriceChange);
             
-            // Проверяем превышение порога
-            if (ratio >= settings.signalThreshold) {
-              const isPositive = lastMinutePriceChange > 0;
+            // ВАЖНО: Проверяем совпадение направлений движения
+            const lastMinutePositive = lastMinutePriceChange > 0;
+            const averagePositive = averagePriceChange > 0;
+            
+            // Сигнал только если направления совпадают
+            if (lastMinutePositive === averagePositive) {
+              // Рассчитываем отношение изменений цен (оба значения с одинаковыми знаками)
+              const ratio = Math.abs(lastMinutePriceChange) / Math.abs(averagePriceChange);
               
-              newSignals.push({
-                id: `${ticker}-${Date.now()}`,
-                time: currentTime,
-                ticker: ticker,
-                value: ratio.toFixed(2),
-                isPositive: isPositive,
-                lastMinuteChange: lastMinutePriceChange.toFixed(6),
-                averageChange: averagePriceChange.toFixed(6),
-                ratio: ratio
-              });
+              // Проверяем превышение порога
+              if (ratio >= settings.signalThreshold) {
+                const isPositive = lastMinutePriceChange > 0;
+                
+                newSignals.push({
+                  id: `${ticker}-${Date.now()}`,
+                  time: currentTime,
+                  ticker: ticker,
+                  value: ratio.toFixed(2),
+                  isPositive: isPositive,
+                  lastMinuteChange: lastMinutePriceChange.toFixed(6),
+                  averageChange: averagePriceChange.toFixed(6),
+                  ratio: ratio,
+                  trendDirection: isPositive ? 'рост' : 'падение'
+                });
+              }
             }
           }
         }
