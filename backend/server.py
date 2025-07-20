@@ -246,6 +246,15 @@ async def get_crypto_prices(
                     "change_30s": track_data.get("change_30s"),
                 })
                 
+                # Добавляем данные для всех запрошенных интервалов
+                for interval in interval_list:
+                    # Конвертируем интервал в секунды
+                    interval_seconds = convert_interval_to_seconds(interval)
+                    if interval_seconds:
+                        change_data = get_price_change_for_interval(track_data, interval_seconds)
+                        if change_data:
+                            formatted_ticker[f"change_{interval_seconds}s"] = change_data
+                
                 # Добавляем свечи для всех запрошенных таймфреймов
                 candles = []
                 for tf in tf_list:
