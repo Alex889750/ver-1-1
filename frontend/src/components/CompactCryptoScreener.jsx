@@ -19,15 +19,38 @@ const CompactCryptoScreener = () => {
   const [activeTickers, setActiveTickers] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState(new Set());
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   
-  // Настройки
+  // Настройки с поддержкой настраиваемых интервалов колонок
   const [settings, setSettings] = useState({
     displayCount: 15,
     search: '',
     sortBy: 'symbol',
     sortOrder: 'asc',
-    chartTimeframes: ['30s', '1m', '5m'], // 3 таймфрейма для графиков
+    chartTimeframes: ['30s', '1m', '5m'],
+    tableIntervals: ['15s', '30s', '24h'] // Настраиваемые интервалы для колонок
   });
+
+  // Доступные интервалы для таблицы
+  const availableTableIntervals = [
+    { value: '2s', label: '2 сек', seconds: 2 },
+    { value: '5s', label: '5 сек', seconds: 5 },
+    { value: '10s', label: '10 сек', seconds: 10 },
+    { value: '15s', label: '15 сек', seconds: 15 },
+    { value: '30s', label: '30 сек', seconds: 30 },
+    { value: '1m', label: '1 мин', seconds: 60 },
+    { value: '2m', label: '2 мин', seconds: 120 },
+    { value: '3m', label: '3 мин', seconds: 180 },
+    { value: '5m', label: '5 мин', seconds: 300 },
+    { value: '10m', label: '10 мин', seconds: 600 },
+    { value: '15m', label: '15 мин', seconds: 900 },
+    { value: '20m', label: '20 мин', seconds: 1200 },
+    { value: '30m', label: '30 мин', seconds: 1800 },
+    { value: '1h', label: '60 мин', seconds: 3600 },
+    { value: '4h', label: '240 мин', seconds: 14400 },
+    { value: '24h', label: '1 день', seconds: 86400 }
+  ];
 
   // Доступные таймфреймы
   const availableTimeframes = [
