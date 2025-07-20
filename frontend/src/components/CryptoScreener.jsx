@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
+import CandleChart from './CandleChart';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -38,6 +39,22 @@ const CryptoScreener = () => {
     return 'text-gray-500';
   };
 
+  const formatShortTermChange = (changeData) => {
+    if (!changeData) {
+      return { text: 'N/A', color: 'text-gray-500' };
+    }
+    
+    const { price_change, percent_change } = changeData;
+    const color = getPriceChangeColor(price_change);
+    const sign = price_change > 0 ? '+' : '';
+    
+    return {
+      text: `${sign}${percent_change.toFixed(2)}%`,
+      color,
+      absolute: `${sign}${formatPrice(price_change)}`
+    };
+  };
+
   const fetchPrices = async () => {
     try {
       setError(null);
@@ -61,7 +78,7 @@ const CryptoScreener = () => {
     // Первоначальная загрузка данных
     fetchPrices();
     
-    // Обновление каждые 2 секунды (чтобы не перегружать API)
+    // Обновление каждые 2 секунды
     const interval = setInterval(fetchPrices, 2000);
     
     return () => clearInterval(interval);
@@ -101,7 +118,7 @@ const CryptoScreener = () => {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-white text-2xl font-semibold mb-2">Загрузка данных MEXC</h2>
-          <p className="text-gray-400">Получение актуальных цен криптовалют...</p>
+          <p className="text-gray-400">Получение актуальных цен и формирование свечных графиков...</p>
         </div>
       </div>
     );
@@ -109,7 +126,7 @@ const CryptoScreener = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-full mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">
@@ -117,7 +134,7 @@ const CryptoScreener = () => {
           </h1>
           <div className="flex justify-center items-center space-x-4">
             <Badge variant="secondary" className="px-4 py-2 text-sm">
-              Реальное время
+              Реальное время + Свечи 30с
             </Badge>
             <span className="text-gray-400 text-sm">
               Последнее обновление: {lastUpdate.toLocaleTimeString()}
@@ -144,11 +161,13 @@ const CryptoScreener = () => {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-700">
-                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Символ</th>
-                    <th className="text-right py-4 px-6 text-gray-300 font-semibold">Цена (USDT)</th>
-                    <th className="text-right py-4 px-6 text-gray-300 font-semibold">Изменение 24ч</th>
-                    <th className="text-right py-4 px-6 text-gray-300 font-semibold">Изменение %</th>
-                    <th className="text-right py-4 px-6 text-gray-300 font-semibold">Объем 24ч</th>
+                    <th className="text-left py-4 px-4 text-gray-300 font-semibold">Символ</th>
+                    <th className="text-right py-4 px-4 text-gray-300 font-semibold">Цена (USDT)</th>
+                    <th className="text-right py-4 px-4 text-gray-300 font-semibold">15с</th>
+                    <th className="text-right py-4 px-4 text-gray-300 font-semibold">30с</th>
+                    <th className="text-right py-4 px-4 text-gray-300 font-semibold">24ч</th>
+                    <th className="text-right py-4 px-4 text-gray-300 font-semibold">24ч %</th>
+                    <th className="text-center py-4 px-4 text-gray-300 font-semibold">График</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -157,16 +176,19 @@ const CryptoScreener = () => {
                     if (!data) {
                       return (
                         <tr key={ticker} className="border-b border-gray-700/50">
-                          <td className="py-4 px-6 text-gray-500" colSpan="5">
+                          <td className="py-4 px-4 text-gray-500" colSpan="7">
                             Загрузка {ticker}...
                           </td>
                         </tr>
                       );
                     }
                     
+                    const change15s = formatShortTermChange(data.change_15s);
+                    const change30s = formatShortTermChange(data.change_30s);
+                    
                     return (
                       <tr key={ticker} className="border-b border-gray-700/50 hover:bg-gray-700/20 transition-colors">
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-4">
                           <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                               <span className="text-white text-xs font-bold">
@@ -179,17 +201,46 @@ const CryptoScreener = () => {
                             </div>
                           </div>
                         </td>
-                        <td className="py-4 px-6 text-right">
+                        
+                        <td className="py-4 px-4 text-right">
                           <span className="text-white text-lg font-mono">
                             ${formatPrice(data.price)}
                           </span>
                         </td>
-                        <td className="py-4 px-6 text-right">
+                        
+                        <td className="py-4 px-4 text-right">
+                          <div className="flex flex-col items-end">
+                            <span className={`font-mono text-sm ${change15s.color}`}>
+                              {change15s.text}
+                            </span>
+                            {change15s.absolute && (
+                              <span className={`font-mono text-xs ${change15s.color} opacity-70`}>
+                                {change15s.absolute}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        
+                        <td className="py-4 px-4 text-right">
+                          <div className="flex flex-col items-end">
+                            <span className={`font-mono text-sm ${change30s.color}`}>
+                              {change30s.text}
+                            </span>
+                            {change30s.absolute && (
+                              <span className={`font-mono text-xs ${change30s.color} opacity-70`}>
+                                {change30s.absolute}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        
+                        <td className="py-4 px-4 text-right">
                           <span className={`font-mono ${getPriceChangeColor(data.change24h)}`}>
                             {data.change24h > 0 ? '+' : ''}{formatPrice(data.change24h)}
                           </span>
                         </td>
-                        <td className="py-4 px-6 text-right">
+                        
+                        <td className="py-4 px-4 text-right">
                           <Badge 
                             variant={data.changePercent24h >= 0 ? "default" : "destructive"}
                             className={`font-mono ${
@@ -201,10 +252,14 @@ const CryptoScreener = () => {
                             {data.changePercent24h > 0 ? '+' : ''}{data.changePercent24h.toFixed(2)}%
                           </Badge>
                         </td>
-                        <td className="py-4 px-6 text-right">
-                          <span className="text-gray-300 font-mono text-sm">
-                            {data.volume ? data.volume.toLocaleString(undefined, {maximumFractionDigits: 0}) : 'N/A'}
-                          </span>
+                        
+                        <td className="py-4 px-4 text-center">
+                          <CandleChart
+                            candles={data.candles || []}
+                            symbol={ticker}
+                            width={200}
+                            height={60}
+                          />
                         </td>
                       </tr>
                     );
@@ -222,6 +277,10 @@ const CryptoScreener = () => {
             <span className={`${statusInfo.textColor} text-sm font-medium`}>
               {statusInfo.text}
             </span>
+          </div>
+          
+          <div className="mt-2 text-xs text-gray-500">
+            30-секундные свечи • Данные за последние 15 и 30 секунд • Обновление в реальном времени
           </div>
         </div>
       </div>
