@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import TradingViewChart from './TradingViewChart';
-import TradingViewWidget from './TradingViewWidget';
 import SettingsPanel from './SettingsPanel';
 import axios from 'axios';
 
