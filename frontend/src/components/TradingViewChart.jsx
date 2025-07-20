@@ -90,19 +90,19 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
   const themeColor = getTimeframeColor();
 
   return (
-    <div className="relative bg-gray-900/90 rounded border border-gray-600 overflow-hidden backdrop-blur-sm">
+    <div className="relative bg-black rounded border border-gray-600 overflow-hidden backdrop-blur-sm">
       <svg width={width} height={height} className="block">
         {/* Background pattern */}
         <defs>
           <pattern id={`grid-${symbol}-${timeframe}`} width="15" height="15" patternUnits="userSpaceOnUse">
-            <path d="M 15 0 L 0 0 0 15" fill="none" stroke="#374151" strokeWidth="0.3" opacity="0.4"/>
+            <path d="M 15 0 L 0 0 0 15" fill="none" stroke="#374151" strokeWidth="0.3" opacity="0.3"/>
           </pattern>
           <linearGradient id={`gradient-${symbol}-${timeframe}`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={themeColor} stopOpacity="0.2"/>
-            <stop offset="100%" stopColor={themeColor} stopOpacity="0.05"/>
+            <stop offset="0%" stopColor={themeColor} stopOpacity="0.1"/>
+            <stop offset="100%" stopColor={themeColor} stopOpacity="0.02"/>
           </linearGradient>
         </defs>
-        <rect width="100%" height="100%" fill={`url(#gradient-${symbol}-${timeframe})`} />
+        <rect width="100%" height="100%" fill="#000000" />
         <rect width="100%" height="100%" fill={`url(#grid-${symbol}-${timeframe})`} />
         
         {/* Price line (connecting close prices) */}
@@ -128,7 +128,7 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
           
           const isGreen = candle.close >= candle.open;
           const color = isGreen ? '#10b981' : '#ef4444'; // green-500 : red-500
-          const fillColor = isGreen ? color : 'transparent';
+          const fillColor = isGreen ? color : '#ef4444'; // Красные свечи теперь заполнены красным
           
           // Тело свечи
           const bodyTop = Math.min(openY, closeY);
@@ -144,7 +144,7 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
                 y2={lowY}
                 stroke={color}
                 strokeWidth="0.8"
-                opacity="0.8"
+                opacity="0.9"
               />
               
               {/* Body (тело свечи) */}
@@ -156,7 +156,7 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
                 fill={fillColor}
                 stroke={color}
                 strokeWidth="0.8"
-                opacity="0.9"
+                opacity="1"
               />
             </g>
           );
