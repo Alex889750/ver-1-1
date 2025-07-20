@@ -766,7 +766,7 @@ const CompactCryptoScreener = () => {
                                 {signal.value}
                               </Badge>
                               <div className="text-xs text-gray-500 font-mono">
-                                {signal.lastMinuteChange}% / {signal.averageChange}%
+                                {signal.lastMinuteChange} / {signal.averageChange}
                               </div>
                             </div>
                           </td>
