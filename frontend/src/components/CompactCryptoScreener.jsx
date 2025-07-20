@@ -123,20 +123,11 @@ const CompactCryptoScreener = () => {
     return 'text-gray-500';
   }, []);
 
-  const formatShortTermChange = useCallback((changeData) => {
-    if (!changeData) {
-      return { text: 'N/A', color: 'text-gray-500' };
-    }
-    
-    const { percent_change } = changeData;
-    const color = getPriceChangeColor(percent_change);
-    const sign = percent_change > 0 ? '+' : '';
-    
-    return {
-      text: `${sign}${percent_change.toFixed(2)}%`,
-      color
-    };
-  }, [getPriceChangeColor]);
+  const formatConfigurableChange = useCallback((data, intervalIndex) => {
+    const changeKey = `change_interval_${intervalIndex}`;
+    const changeData = data[changeKey];
+    return formatShortTermChange(changeData);
+  }, [formatShortTermChange]);
 
   const fetchPrices = useCallback(async () => {
     try {
