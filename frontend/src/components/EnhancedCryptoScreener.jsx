@@ -31,7 +31,9 @@ const EnhancedCryptoScreener = () => {
       { interval: 'none', operator: '>', value: 0 },
       { interval: 'none', operator: '>', value: 0 },
       { interval: 'none', operator: '>', value: 0 }
-    ]
+    ],
+    // Настраиваемые интервалы для колонок таблицы
+    tableIntervals: ['15s', '30s', '24h']
   });
 
   // Доступные таймфреймы
