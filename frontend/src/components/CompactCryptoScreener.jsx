@@ -598,7 +598,7 @@ const CompactCryptoScreener = () => {
                             {settings.tableIntervals.map((interval, index) => {
                               const changeData = formatConfigurableChange(data, index);
                               return (
-                                <td key={`interval-${index}`} className="py-2 px-2 text-right">
+                                <td key={`interval-${index}`} className="py-2 px-2 text-center">
                                   <span className={`font-mono text-sm ${changeData.color}`}>
                                     {changeData.text}
                                   </span>
