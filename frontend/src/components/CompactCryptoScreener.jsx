@@ -545,9 +545,17 @@ const CompactCryptoScreener = () => {
                         } ${column.sortable ? 'select-none' : ''}`}
                         onClick={() => column.sortable && handleSort(column.key)}
                       >
-                        <div className="flex items-center justify-between text-xs">
+                        <div className={`flex items-center text-xs ${
+                          column.align === 'right' ? 'justify-end' : 
+                          column.align === 'center' ? 'justify-center' : 'justify-between'
+                        }`}>
                           <span>{column.label}</span>
-                          {column.sortable && (
+                          {column.sortable && column.align !== 'center' && column.align !== 'right' && (
+                            <span className="ml-1 opacity-60">
+                              {getSortIcon(column.key)}
+                            </span>
+                          )}
+                          {column.sortable && (column.align === 'center' || column.align === 'right') && (
                             <span className="ml-1 opacity-60">
                               {getSortIcon(column.key)}
                             </span>
