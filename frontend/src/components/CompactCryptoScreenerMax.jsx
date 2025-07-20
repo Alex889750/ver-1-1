@@ -409,7 +409,38 @@ const CompactCryptoScreenerMax = () => {
   };
 
   const statusInfo = getConnectionStatusInfo();
-  const dataArray = Object.entries(priceData);
+  
+  // Создаем отсортированный массив по максимальным значениям интервалов
+  const dataArray = useMemo(() => {
+    const entries = Object.entries(priceData);
+    
+    // Сортируем по абсолютным максимальным значениям интервальных изменений
+    return entries.sort((a, b) => {
+      const [, dataA] = a;
+      const [, dataB] = b;
+      
+      // Получаем максимальные абсолютные значения для всех интервалов
+      const getMaxAbsValue = (data) => {
+        const values = [];
+        
+        // Проверяем все настраиваемые интервалы
+        for (let i = 0; i < 3; i++) {
+          const changeData = data[`change_interval_${i}`];
+          if (changeData && changeData.percent_change !== undefined) {
+            values.push(Math.abs(changeData.percent_change));
+          }
+        }
+        
+        return values.length > 0 ? Math.max(...values) : 0;
+      };
+      
+      const maxA = getMaxAbsValue(dataA);
+      const maxB = getMaxAbsValue(dataB);
+      
+      // Сортируем по убыванию (большие значения сверху)
+      return maxB - maxA;
+    });
+  }, [priceData]);
 
   if (isLoading) {
     return (
