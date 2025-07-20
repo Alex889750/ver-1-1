@@ -429,17 +429,24 @@ const CompactCryptoScreener = () => {
                             <tr className="bg-gray-800/30">
                               <td colSpan={columns.length} className="py-4 px-4">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                  {settings.chartTimeframes.map((timeframe) => (
-                                    <div key={timeframe} className="space-y-2">
-                                      <TradingViewChart
-                                        candles={data.candles || []}
-                                        symbol={ticker}
-                                        timeframe={timeframe}
-                                        width={300}
-                                        height={120}
-                                      />
-                                    </div>
-                                  ))}
+                                  {settings.chartTimeframes.map((timeframe) => {
+                                    // Фильтруем свечи только для данного таймфрейма
+                                    const timeframeCandles = (data.candles || []).filter(candle => 
+                                      candle.timeframe === timeframe
+                                    );
+                                    
+                                    return (
+                                      <div key={timeframe} className="space-y-2">
+                                        <TradingViewChart
+                                          candles={timeframeCandles}
+                                          symbol={ticker}
+                                          timeframe={timeframe}
+                                          width={300}
+                                          height={120}
+                                        />
+                                      </div>
+                                    );
+                                  })}
                                 </div>
                                 <div className="mt-3 text-center">
                                   <Button
