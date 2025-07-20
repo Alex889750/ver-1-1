@@ -19,6 +19,8 @@ const EnhancedCryptoScreener = () => {
   const [activeTickers, setActiveTickers] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState(new Set());
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   
   // Расширенные настройки
   const [settings, setSettings] = useState({
