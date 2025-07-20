@@ -208,6 +208,61 @@ const CompactCryptoScreener = () => {
     return settings.sortOrder === 'asc' ? '↑' : '↓';
   };
 
+  const loadHistory = async () => {
+    try {
+      setHistoryLoading(true);
+      setHistoryStatus({ status: 'loading', progress: 0, total: 0, current_symbol: '' });
+      
+      // Запускаем загрузку истории
+      const response = await axios.post(`${API}/crypto/load-history`);
+      
+      if (response.data.status === 'started') {
+        // Начинаем опрос статуса
+        pollHistoryStatus();
+      } else {
+        throw new Error('Failed to start history loading');
+      }
+    } catch (err) {
+      console.error('Error loading history:', err);
+      setError('Ошибка загрузки истории');
+      setHistoryLoading(false);
+    }
+  };
+
+  const pollHistoryStatus = async () => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await axios.get(`${API}/crypto/history-status`);
+        const status = response.data;
+        
+        setHistoryStatus(status);
+        
+        if (status.status === 'completed') {
+          setHistoryLoading(false);
+          setHistoryLoaded(true);
+          clearInterval(pollInterval);
+        } else if (status.status === 'error') {
+          setHistoryLoading(false);
+          setError('Ошибка при загрузке исторических данных');
+          clearInterval(pollInterval);
+        }
+      } catch (err) {
+        console.error('Error polling history status:', err);
+        clearInterval(pollInterval);
+        setHistoryLoading(false);
+      }
+    }, 1000); // Опрос каждую секунду
+    
+    // Автоматически останавливаем опрос через 5 минут (таймаут)
+    setTimeout(() => {
+      clearInterval(pollInterval);
+      if (historyLoading) {
+        setHistoryLoading(false);
+        setError('Таймаут загрузки истории');
+      }
+    }, 300000); // 5 минут
+  };
+
   const toggleRowExpansion = (ticker) => {
     const newExpanded = new Set(expandedRows);
     if (newExpanded.has(ticker)) {
