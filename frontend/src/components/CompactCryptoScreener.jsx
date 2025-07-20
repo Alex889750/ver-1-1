@@ -35,8 +35,15 @@ const CompactCryptoScreener = () => {
     sortBy: 'symbol',
     sortOrder: 'asc',
     chartTimeframes: ['30s', '1m', '5m'],
-    tableIntervals: ['15s', '30s', '24h'] // Настраиваемые интервалы для колонок
+    tableIntervals: ['15s', '30s', '24h'], // Настраиваемые интервалы для колонок
+    // Настройки для таблицы сигналов
+    signalThreshold: 1.05, // Порог превышения (5%)
+    signalCandlesCount: 10, // Количество свечей для расчета среднего
+    showSignalsTable: true // Показывать ли таблицу сигналов
   });
+
+  // Состояние для таблицы сигналов
+  const [signalsData, setSignalsData] = useState([]);
 
   // Доступные интервалы для таблицы
   const availableTableIntervals = [
