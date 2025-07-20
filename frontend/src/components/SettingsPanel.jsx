@@ -287,7 +287,7 @@ const SettingsPanel = ({
             {/* Порог превышения */}
             <div className="space-y-1">
               <Label className="text-gray-300 text-xs">
-                Порог отношения изменений цен (1.0 - 50.0)
+                Порог усиления тренда (1.0 - 50.0)
               </Label>
               <Input
                 type="number"
@@ -300,7 +300,7 @@ const SettingsPanel = ({
                 placeholder="3.0"
               />
               <div className="text-xs text-gray-500">
-                Пример: при пороге {settings.signalThreshold || 3.0} сигнал если изменение цены за минуту в {(settings.signalThreshold || 3.0)}x больше среднего
+                Сигнал если текущая минута усиливает тренд в {(settings.signalThreshold || 3.0)}x раз (только в том же направлении)
               </div>
             </div>
 
