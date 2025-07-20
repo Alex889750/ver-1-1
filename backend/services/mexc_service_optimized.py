@@ -175,6 +175,44 @@ class OptimizedMEXCService:
                 "source": "mexc",
                 "error": "formatting_error"
             }
+    
+    async def get_klines(self, symbol: str, interval: str, limit: int = 50) -> List:
+        """
+        Получить K-line данные (свечи) для символа
+        
+        Args:
+            symbol: Торговый символ (например, BTCUSDT)
+            interval: Интервал (1m, 5m, 15m, 1h, 4h, 1d)
+            limit: Количество свечей (макс 1000)
+        
+        Returns:
+            Список K-line данных
+        """
+        try:
+            session = await self.get_session()
+            url = f"{self.base_url}/api/v3/klines"
+            
+            params = {
+                'symbol': symbol,
+                'interval': interval,
+                'limit': min(limit, 1000)  # MEXC лимит
+            }
+            
+            logger.debug(f"Fetching klines for {symbol} {interval} (limit: {limit})")
+            
+            async with session.get(url, params=params) as response:
+                if response.status == 200:
+                    klines = await response.json()
+                    logger.debug(f"Successfully fetched {len(klines)} klines for {symbol} {interval}")
+                    return klines
+                else:
+                    error_text = await response.text()
+                    logger.error(f"Error fetching klines for {symbol} {interval}: {response.status} - {error_text}")
+                    return []
+                    
+        except Exception as e:
+            logger.error(f"Error in get_klines for {symbol} {interval}: {str(e)}")
+            return []
 
 # Глобальный экземпляр оптимизированного сервиса
 optimized_mexc_service = OptimizedMEXCService()
