@@ -358,7 +358,7 @@ const CompactCryptoScreener = () => {
         )}
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
           <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
             <div className="text-gray-400 text-xs">Показано</div>
             <div className="text-white text-sm font-bold">{activeTickers}</div>
@@ -378,6 +378,28 @@ const CompactCryptoScreener = () => {
           <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
             <div className="text-gray-400 text-xs">Поиск</div>
             <div className="text-yellow-400 text-sm">{settings.search || 'Все'}</div>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
+            <div className="text-gray-400 text-xs">История</div>
+            {historyLoading ? (
+              <div className="text-orange-400 text-sm">
+                {historyStatus.total > 0 ? 
+                  `${historyStatus.progress}/${historyStatus.total}` : 
+                  'Загрузка...'
+                }
+              </div>
+            ) : historyLoaded ? (
+              <div className="text-green-400 text-sm">✓ Готово</div>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={loadHistory}
+                className="text-xs px-2 py-0.5 h-auto border-blue-500 text-blue-400 hover:bg-blue-600/20"
+              >
+                Загрузить
+              </Button>
+            )}
           </div>
         </div>
 
