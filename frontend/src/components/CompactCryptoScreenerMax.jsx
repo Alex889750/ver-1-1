@@ -32,8 +32,8 @@ const CompactCryptoScreenerMax = () => {
   const [settings, setSettings] = useState({
     displayCount: 15,
     search: '',
-    sortBy: 'symbol',
-    sortOrder: 'asc',
+    sortBy: 'change_interval_0', // Автоматически сортируем по первому интервалу
+    sortOrder: 'desc', // По убыванию (максимальные значения наверху)
     chartTimeframes: ['30s', '1m', '5m'],
     tableIntervals: ['15s', '30s', '24h'], // Настраиваемые интервалы для колонок
     // Настройки для таблицы сигналов
