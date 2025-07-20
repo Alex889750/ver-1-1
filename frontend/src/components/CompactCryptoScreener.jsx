@@ -64,16 +64,35 @@ const CompactCryptoScreener = () => {
     { value: '1d', label: '1 день', color: '#84cc16' },
   ];
 
-  // Компактные колонки (без 24ч в долларах)
-  const columns = [
-    { key: 'symbol', label: 'Символ', sortable: true, width: '200px' },
-    { key: 'price', label: 'Цена (USDT)', sortable: true, align: 'right', width: '120px' },
-    { key: 'change_15s', label: '15с', sortable: true, align: 'right', width: '80px' },
-    { key: 'change_30s', label: '30с', sortable: true, align: 'right', width: '80px' },
-    { key: 'changePercent24h', label: '24ч %', sortable: true, align: 'right', width: '90px' },
-    { key: 'volume', label: 'Объем', sortable: true, align: 'right', width: '100px' },
-    { key: 'actions', label: 'Действия', sortable: false, align: 'center', width: '100px' },
-  ];
+  // Dynamic columns based on tableIntervals settings
+  const getColumns = () => {
+    const baseColumns = [
+      { key: 'symbol', label: 'Символ', sortable: true, width: '200px' },
+      { key: 'price', label: 'Цена (USDT)', sortable: true, align: 'right', width: '120px' },
+    ];
+    
+    // Add configurable interval columns
+    const intervalColumns = settings.tableIntervals.map((interval, index) => {
+      const intervalObj = availableTableIntervals.find(i => i.value === interval);
+      return {
+        key: `change_interval_${index}`,
+        label: intervalObj ? intervalObj.label : interval,
+        sortable: true,
+        align: 'right',
+        width: '80px'
+      };
+    });
+    
+    const endColumns = [
+      { key: 'changePercent24h', label: '24ч %', sortable: true, align: 'right', width: '90px' },
+      { key: 'volume', label: 'Объем', sortable: true, align: 'right', width: '100px' },
+      { key: 'actions', label: 'Действия', sortable: false, align: 'center', width: '100px' },
+    ];
+    
+    return [...baseColumns, ...intervalColumns, ...endColumns];
+  };
+
+  const columns = getColumns();
 
   const formatPrice = useCallback((price) => {
     if (price >= 1) {
