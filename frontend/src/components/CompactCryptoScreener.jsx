@@ -39,6 +39,7 @@ const CompactCryptoScreener = () => {
     // Настройки для таблицы сигналов
     signalThreshold: 3.0, // Порог превышения (3.0 = отношение 3:1)
     signalCandlesCount: 6, // Количество свечей для расчета среднего (6 минут)
+    signalTimeframe: '1m', // Таймфрейм для анализа сигналов
     showSignalsTable: true // Показывать ли таблицу сигналов
   });
 
