@@ -469,8 +469,9 @@ const EnhancedCryptoScreener = () => {
                     </tr>
                   ) : (
                     filteredData.map(([ticker, data]) => {
-                      const change15s = formatShortTermChange(data.change_15s);
-                      const change30s = formatShortTermChange(data.change_30s);
+                      const change0 = getCustomIntervalChange(data, settings.tableIntervals[0]);
+                      const change1 = getCustomIntervalChange(data, settings.tableIntervals[1]);
+                      const change2 = getCustomIntervalChange(data, settings.tableIntervals[2]);
                       const isExpanded = expandedRows.has(ticker);
                       
                       return (
@@ -497,27 +498,37 @@ const EnhancedCryptoScreener = () => {
                               </span>
                             </td>
                             
+                            {/* Первый настраиваемый интервал */}
                             <td className="py-2 px-2 text-right">
-                              <span className={`font-mono text-xs ${change15s.color}`}>
-                                {change15s.text}
+                              <span className={`font-mono text-xs ${change0.color}`}>
+                                {change0.text}
                               </span>
                             </td>
                             
+                            {/* Второй настраиваемый интервал */}
                             <td className="py-2 px-2 text-right">
-                              <span className={`font-mono text-xs ${change30s.color}`}>
-                                {change30s.text}
+                              <span className={`font-mono text-xs ${change1.color}`}>
+                                {change1.text}
                               </span>
                             </td>
                             
+                            {/* Третий настраиваемый интервал */}
                             <td className="py-2 px-2 text-right">
-                              {/* Убираем цветной фон с 24ч % */}
-                              <span className={`font-mono text-xs border rounded px-2 py-1 ${
-                                data.changePercent24h >= 0 
-                                  ? 'border-green-500 text-green-400' 
-                                  : 'border-red-500 text-red-400'
-                              }`}>
-                                {data.changePercent24h > 0 ? '+' : ''}{data.changePercent24h.toFixed(2)}%
-                              </span>
+                              {settings.tableIntervals[2] === '24h' ? (
+                                // Специальный дизайн для 24ч %
+                                <span className={`font-mono text-xs border rounded px-2 py-1 ${
+                                  data.changePercent24h >= 0 
+                                    ? 'border-green-500 text-green-400' 
+                                    : 'border-red-500 text-red-400'
+                                }`}>
+                                  {change2.text}
+                                </span>
+                              ) : (
+                                // Обычный дизайн для других интервалов
+                                <span className={`font-mono text-xs ${change2.color}`}>
+                                  {change2.text}
+                                </span>
+                              )}
                             </td>
                             
                             <td className="py-2 px-2 text-right">
