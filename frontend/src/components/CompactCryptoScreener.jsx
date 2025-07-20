@@ -658,7 +658,7 @@ const CompactCryptoScreener = () => {
                             </td>
                             
                             <td className="py-2 px-2 text-right">
-                              <span className="text-gray-300 font-mono text-xs">
+                              <span className="text-gray-300 font-mono text-sm">
                                 {formatVolume(data.volume)}
                               </span>
                             </td>
