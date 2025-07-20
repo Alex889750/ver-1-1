@@ -66,6 +66,18 @@ const CompactCryptoScreener = () => {
     { value: '24h', label: '1 день', seconds: 86400 }
   ];
 
+  // Доступные таймфреймы для сигналов
+  const availableSignalTimeframes = [
+    { value: '1m', label: '1 мин' },
+    { value: '2m', label: '2 мин' },
+    { value: '3m', label: '3 мин' },
+    { value: '5m', label: '5 мин' },
+    { value: '15m', label: '15 мин' },
+    { value: '20m', label: '20 мин' },
+    { value: '30m', label: '30 мин' },
+    { value: '1h', label: '60 мин' }
+  ];
+
   // Доступные таймфреймы
   const availableTimeframes = [
     { value: '15s', label: '15 сек', color: '#3b82f6' },
