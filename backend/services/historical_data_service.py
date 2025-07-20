@@ -174,3 +174,74 @@ class HistoricalDataService:
 
 # Глобальный экземпляр сервиса
 historical_data_service = HistoricalDataService()
+
+# Глобальное состояние загрузки истории
+history_load_status = {
+    "status": "idle",  # idle, loading, completed, error
+    "progress": 0,
+    "total": 0,
+    "current_symbol": "",
+    "start_time": None,
+    "end_time": None,
+    "errors": []
+}
+
+def get_history_load_status() -> Dict:
+    """Получить текущий статус загрузки истории"""
+    return history_load_status.copy()
+
+async def load_historical_data_for_all_tickers():
+    """
+    Загрузить исторические данные для всех поддерживаемых тикеров
+    """
+    global history_load_status
+    
+    from config.tickers import SUPPORTED_TICKERS
+    
+    history_load_status.update({
+        "status": "loading",
+        "progress": 0,
+        "total": len(SUPPORTED_TICKERS),
+        "start_time": datetime.utcnow().isoformat(),
+        "errors": []
+    })
+    
+    logger.info(f"Starting historical data load for {len(SUPPORTED_TICKERS)} tickers")
+    
+    try:
+        # Загружаем данные только для поддерживаемых MEXC таймфреймов
+        supported_timeframes = ['1m', '5m', '15m', '1h', '4h', '1d']
+        
+        # Загружаем данные для всех символов
+        result = await historical_data_service.load_historical_data_for_symbols(
+            SUPPORTED_TICKERS, 
+            supported_timeframes
+        )
+        
+        # Обновляем прогресс
+        for i, symbol in enumerate(SUPPORTED_TICKERS):
+            history_load_status.update({
+                "current_symbol": symbol,
+                "progress": i + 1
+            })
+            
+            # Небольшая пауза для обновления UI
+            await asyncio.sleep(0.01)
+        
+        # Завершение
+        history_load_status.update({
+            "status": "completed",
+            "current_symbol": "",
+            "end_time": datetime.utcnow().isoformat()
+        })
+        
+        logger.info(f"Historical data load completed for {len(result)} symbols")
+        
+    except Exception as e:
+        logger.error(f"Fatal error during historical data load: {str(e)}")
+        history_load_status.update({
+            "status": "error",
+            "current_symbol": "",
+            "end_time": datetime.utcnow().isoformat()
+        })
+        history_load_status["errors"].append(f"Fatal error: {str(e)}")
