@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,9 +6,10 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Dict
 import uuid
 from datetime import datetime
+from services.mexc_service import mexc_service
 
 
 ROOT_DIR = Path(__file__).parent
@@ -35,10 +36,105 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+class CryptoPrice(BaseModel):
+    symbol: str
+    price: float
+    change24h: float
+    changePercent24h: float
+    volume: float = 0
+    high24h: float = 0
+    low24h: float = 0
+    timestamp: str
+    source: str = "mexc"
+
+class CryptoPricesResponse(BaseModel):
+    data: Dict[str, CryptoPrice]
+    timestamp: str
+    count: int
+
+# Список поддерживаемых тикеров
+SUPPORTED_TICKERS = [
+    "LTCUSDT", "SHIBUSDT", "AVAXUSDT", "LINKUSDT", "BCHUSDT",
+    "ATOMUSDT", "XMRUSDT", "APTUSDT", "FILUSDT", "NEARUSDT"
+]
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "MEXC Crypto Screener API"}
+
+@api_router.get("/health")
+async def health_check():
+    """Проверка работоспособности API"""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "supported_tickers": SUPPORTED_TICKERS
+    }
+
+@api_router.get("/crypto/prices", response_model=CryptoPricesResponse)
+async def get_crypto_prices():
+    """
+    Получить актуальные цены всех поддерживаемых криптовалют
+    """
+    try:
+        # Получаем данные от MEXC API
+        raw_data = await mexc_service.get_multiple_tickers(SUPPORTED_TICKERS)
+        
+        # Форматируем данные
+        formatted_data = {}
+        for symbol, ticker_data in raw_data.items():
+            formatted_ticker = mexc_service.format_ticker_data(ticker_data)
+            formatted_data[symbol] = CryptoPrice(**formatted_ticker)
+        
+        response = CryptoPricesResponse(
+            data=formatted_data,
+            timestamp=datetime.utcnow().isoformat(),
+            count=len(formatted_data)
+        )
+        
+        return response
+        
+    except Exception as e:
+        logging.error(f"Error fetching crypto prices: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to fetch crypto prices: {str(e)}"
+        )
+
+@api_router.get("/crypto/price/{symbol}")
+async def get_single_crypto_price(symbol: str):
+    """
+    Получить актуальную цену конкретной криптовалюты
+    """
+    try:
+        # Проверяем, что символ поддерживается
+        if symbol.upper() not in SUPPORTED_TICKERS:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Symbol {symbol} not supported. Supported symbols: {SUPPORTED_TICKERS}"
+            )
+        
+        # Получаем данные от MEXC API
+        raw_data = await mexc_service.get_24hr_ticker(symbol.upper())
+        
+        # Форматируем данные
+        formatted_data = mexc_service.format_ticker_data(raw_data)
+        crypto_price = CryptoPrice(**formatted_data)
+        
+        return {
+            "data": crypto_price,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error fetching price for {symbol}: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to fetch price for {symbol}: {str(e)}"
+        )
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
@@ -70,6 +166,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_event():
+    """Инициализация при запуске приложения"""
+    logger.info("MEXC Crypto Screener API starting up...")
+
 @app.on_event("shutdown")
-async def shutdown_db_client():
+async def shutdown_event():
+    """Очистка ресурсов при завершении работы"""
+    logger.info("MEXC Crypto Screener API shutting down...")
+    await mexc_service.close_session()
     client.close()

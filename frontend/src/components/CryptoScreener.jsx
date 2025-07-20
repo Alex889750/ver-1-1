@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { getMockPriceData } from '../data/mock';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const CryptoScreener = () => {
   const [priceData, setPriceData] = useState({});
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('connecting');
   
   const tickers = [
     'LTCUSDT', 'SHIBUSDT', 'AVAXUSDT', 'LINKUSDT', 'BCHUSDT',
@@ -32,21 +38,74 @@ const CryptoScreener = () => {
     return 'text-gray-500';
   };
 
-  const updatePrices = () => {
-    const newData = getMockPriceData();
-    setPriceData(newData);
-    setLastUpdate(new Date());
+  const fetchPrices = async () => {
+    try {
+      setError(null);
+      const response = await axios.get(`${API}/crypto/prices`);
+      
+      if (response.data && response.data.data) {
+        setPriceData(response.data.data);
+        setLastUpdate(new Date());
+        setConnectionStatus('connected');
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error('Error fetching prices:', err);
+      setError('Ошибка получения данных с MEXC');
+      setConnectionStatus('error');
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    // Инициализация данных
-    updatePrices();
+    // Первоначальная загрузка данных
+    fetchPrices();
     
-    // Обновление каждую секунду
-    const interval = setInterval(updatePrices, 1000);
+    // Обновление каждые 2 секунды (чтобы не перегружать API)
+    const interval = setInterval(fetchPrices, 2000);
     
     return () => clearInterval(interval);
   }, []);
+
+  const getConnectionStatusInfo = () => {
+    switch (connectionStatus) {
+      case 'connected':
+        return {
+          color: 'bg-green-600/20 border-green-600',
+          textColor: 'text-green-400',
+          icon: 'w-2 h-2 bg-green-500 rounded-full animate-pulse',
+          text: 'Подключение к MEXC активно • Обновление каждые 2 секунды'
+        };
+      case 'error':
+        return {
+          color: 'bg-red-600/20 border-red-600',
+          textColor: 'text-red-400',
+          icon: 'w-2 h-2 bg-red-500 rounded-full',
+          text: 'Ошибка подключения к MEXC'
+        };
+      default:
+        return {
+          color: 'bg-yellow-600/20 border-yellow-600',
+          textColor: 'text-yellow-400',
+          icon: 'w-2 h-2 bg-yellow-500 rounded-full animate-pulse',
+          text: 'Подключение к MEXC...'
+        };
+    }
+  };
+
+  const statusInfo = getConnectionStatusInfo();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-white text-2xl font-semibold mb-2">Загрузка данных MEXC</h2>
+          <p className="text-gray-400">Получение актуальных цен криптовалют...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6">
@@ -66,10 +125,19 @@ const CryptoScreener = () => {
           </div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6">
+            <div className="bg-red-600/20 border border-red-600 rounded-lg p-4 text-center">
+              <p className="text-red-400">{error}</p>
+            </div>
+          </div>
+        )}
+
         {/* Price Table */}
         <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-white text-2xl">Цены криптовалют</CardTitle>
+            <CardTitle className="text-white text-2xl">Цены криптовалют (MEXC)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -80,12 +148,21 @@ const CryptoScreener = () => {
                     <th className="text-right py-4 px-6 text-gray-300 font-semibold">Цена (USDT)</th>
                     <th className="text-right py-4 px-6 text-gray-300 font-semibold">Изменение 24ч</th>
                     <th className="text-right py-4 px-6 text-gray-300 font-semibold">Изменение %</th>
+                    <th className="text-right py-4 px-6 text-gray-300 font-semibold">Объем 24ч</th>
                   </tr>
                 </thead>
                 <tbody>
                   {tickers.map((ticker) => {
                     const data = priceData[ticker];
-                    if (!data) return null;
+                    if (!data) {
+                      return (
+                        <tr key={ticker} className="border-b border-gray-700/50">
+                          <td className="py-4 px-6 text-gray-500" colSpan="5">
+                            Загрузка {ticker}...
+                          </td>
+                        </tr>
+                      );
+                    }
                     
                     return (
                       <tr key={ticker} className="border-b border-gray-700/50 hover:bg-gray-700/20 transition-colors">
@@ -124,6 +201,11 @@ const CryptoScreener = () => {
                             {data.changePercent24h > 0 ? '+' : ''}{data.changePercent24h.toFixed(2)}%
                           </Badge>
                         </td>
+                        <td className="py-4 px-6 text-right">
+                          <span className="text-gray-300 font-mono text-sm">
+                            {data.volume ? data.volume.toLocaleString(undefined, {maximumFractionDigits: 0}) : 'N/A'}
+                          </span>
+                        </td>
                       </tr>
                     );
                   })}
@@ -135,10 +217,10 @@ const CryptoScreener = () => {
 
         {/* Status Indicator */}
         <div className="mt-6 text-center">
-          <div className="inline-flex items-center space-x-2 bg-green-600/20 border border-green-600 rounded-full px-4 py-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-green-400 text-sm font-medium">
-              Подключение активно • Обновление каждую секунду
+          <div className={`inline-flex items-center space-x-2 ${statusInfo.color} border rounded-full px-4 py-2`}>
+            <div className={statusInfo.icon}></div>
+            <span className={`${statusInfo.textColor} text-sm font-medium`}>
+              {statusInfo.text}
             </span>
           </div>
         </div>
