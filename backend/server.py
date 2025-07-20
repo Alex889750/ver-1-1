@@ -155,6 +155,16 @@ async def get_supported_tickers():
         timestamp=datetime.utcnow().isoformat()
     )
 
+def parse_interval_to_seconds(interval: str) -> int:
+    """Convert interval string to seconds"""
+    interval_map = {
+        '2s': 2, '5s': 5, '10s': 10, '15s': 15, '30s': 30,
+        '1m': 60, '2m': 120, '3m': 180, '5m': 300, '10m': 600,
+        '15m': 900, '20m': 1200, '30m': 1800, '1h': 3600,
+        '4h': 14400, '24h': 86400, '1d': 86400
+    }
+    return interval_map.get(interval, 15)  # Default to 15 seconds
+
 @api_router.get("/crypto/prices", response_model=CryptoPricesResponse)
 async def get_crypto_prices(
     limit: Optional[int] = Query(default=20, ge=1, le=50, description="Number of tickers to return"),
