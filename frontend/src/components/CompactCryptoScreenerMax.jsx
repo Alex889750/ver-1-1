@@ -414,31 +414,32 @@ const CompactCryptoScreenerMax = () => {
   const dataArray = useMemo(() => {
     const entries = Object.entries(priceData);
     
-    // Сортируем по абсолютным максимальным значениям интервальных изменений
+    // Сортируем по максимальному абсолютному значению среди всех интервальных колонок
     return entries.sort((a, b) => {
       const [, dataA] = a;
       const [, dataB] = b;
       
-      // Получаем максимальные абсолютные значения для всех интервалов
+      // Получаем максимальное абсолютное значение среди всех интервалов
       const getMaxAbsValue = (data) => {
         const values = [];
         
-        // Проверяем все настраиваемые интервалы
+        // Проверяем все настраиваемые интервалы (change_interval_0, change_interval_1, change_interval_2)
         for (let i = 0; i < 3; i++) {
           const changeData = data[`change_interval_${i}`];
-          if (changeData && changeData.percent_change !== undefined) {
+          if (changeData && typeof changeData.percent_change === 'number') {
             values.push(Math.abs(changeData.percent_change));
           }
         }
         
+        // Возвращаем максимальное абсолютное значение, или 0 если нет данных
         return values.length > 0 ? Math.max(...values) : 0;
       };
       
-      const maxA = getMaxAbsValue(dataA);
-      const maxB = getMaxAbsValue(dataB);
+      const maxAbsA = getMaxAbsValue(dataA);
+      const maxAbsB = getMaxAbsValue(dataB);
       
-      // Сортируем по убыванию (большие значения сверху)
-      return maxB - maxA;
+      // Сортируем по убыванию абсолютных значений (большие значения сверху)
+      return maxAbsB - maxAbsA;
     });
   }, [priceData]);
 
