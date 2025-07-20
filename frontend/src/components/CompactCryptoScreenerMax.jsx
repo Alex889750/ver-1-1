@@ -9,7 +9,7 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const CompactCryptoScreener = () => {
+const CompactCryptoScreenerMax = () => {
   const [priceData, setPriceData] = useState({});
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(true);
