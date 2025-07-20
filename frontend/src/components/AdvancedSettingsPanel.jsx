@@ -178,6 +178,43 @@ const AdvancedSettingsPanel = ({
             )}
           </div>
 
+          {/* Настройка интервалов для колонок таблицы */}
+          <div className="space-y-3">
+            <Label className="text-gray-300 text-sm font-medium">
+              📊 Интервалы для колонок таблицы
+            </Label>
+            {(settings.tableIntervals || ['15s', '30s', '24h']).map((interval, index) => (
+              <div key={index} className="bg-gray-700/50 rounded-lg p-3">
+                <div className="text-xs text-gray-400 mb-2">Колонка {index + 1}</div>
+                <Select 
+                  value={interval} 
+                  onValueChange={(value) => {
+                    const newIntervals = [...(settings.tableIntervals || ['15s', '30s', '24h'])];
+                    newIntervals[index] = value;
+                    onSettingsChange({
+                      ...settings,
+                      tableIntervals: newIntervals
+                    });
+                  }}
+                >
+                  <SelectTrigger className="bg-gray-600 border-gray-500 text-white text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-600">
+                    {availableIntervals.map((intervalOption) => (
+                      <SelectItem key={intervalOption.value} value={intervalOption.value} className="text-white">
+                        {intervalOption.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="text-xs text-gray-500 mt-1">
+                  Показывает изменения за {availableIntervals.find(i => i.value === interval)?.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Настраиваемые фильтры */}
           <div className="space-y-3">
             <Label className="text-gray-300 text-sm font-medium">
