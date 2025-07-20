@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
+import { Checkbox } from './ui/checkbox';
 
 const SettingsPanel = ({ 
   settings, 
@@ -11,7 +12,8 @@ const SettingsPanel = ({
   isOpen, 
   onToggle,
   totalTickers = 0,
-  activeTickers = 0
+  activeTickers = 0,
+  availableTimeframes = []
 }) => {
   const handleDisplayCountChange = (e) => {
     const value = Math.max(1, Math.min(30, parseInt(e.target.value) || 10));
@@ -25,6 +27,32 @@ const SettingsPanel = ({
     onSettingsChange({
       ...settings,
       search: e.target.value
+    });
+  };
+
+  const handleTimeframeToggle = (timeframe) => {
+    const currentTimeframes = settings.chartTimeframes || ['30s', '1m', '5m'];
+    let newTimeframes;
+    
+    if (currentTimeframes.includes(timeframe)) {
+      // Убираем таймфрейм, но не менее 1
+      newTimeframes = currentTimeframes.filter(tf => tf !== timeframe);
+      if (newTimeframes.length === 0) {
+        newTimeframes = [timeframe]; // Оставляем хотя бы один
+      }
+    } else {
+      // Добавляем таймфрейм, но не более 3
+      if (currentTimeframes.length < 3) {
+        newTimeframes = [...currentTimeframes, timeframe];
+      } else {
+        // Заменяем последний
+        newTimeframes = [...currentTimeframes.slice(0, 2), timeframe];
+      }
+    }
+    
+    onSettingsChange({
+      ...settings,
+      chartTimeframes: newTimeframes
     });
   };
 
@@ -42,11 +70,11 @@ const SettingsPanel = ({
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50 w-80">
-      <Card className="bg-gray-800/95 border-gray-700 backdrop-blur-sm shadow-2xl">
+    <div className="fixed top-4 right-4 z-50 w-96">
+      <Card className="bg-gray-800/95 border-gray-700 backdrop-blur-sm shadow-2xl max-h-screen overflow-y-auto">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-white text-lg">⚙️ Настройки скринера</CardTitle>
+            <CardTitle className="text-white text-lg">⚙️ TradingView Настройки</CardTitle>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -128,7 +156,6 @@ const SettingsPanel = ({
                   <option value="price">Цена</option>
                   <option value="change_15s">15 секунд</option>
                   <option value="change_30s">30 секунд</option>
-                  <option value="change24h">24ч изменение</option>
                   <option value="changePercent24h">24ч %</option>
                   <option value="volume">Объем</option>
                 </select>
@@ -146,6 +173,38 @@ const SettingsPanel = ({
                   <option value="desc">↓ По убыванию</option>
                 </select>
               </div>
+            </div>
+          </div>
+
+          {/* Настройки таймфреймов графиков */}
+          <div className="space-y-2">
+            <Label className="text-gray-300 text-sm font-medium">
+              📊 Таймфреймы графиков (выберите 1-3)
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              {availableTimeframes.map((tf) => (
+                <div key={tf.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`tf-${tf.value}`}
+                    checked={settings.chartTimeframes?.includes(tf.value) || false}
+                    onCheckedChange={() => handleTimeframeToggle(tf.value)}
+                    className="border-gray-600"
+                  />
+                  <label 
+                    htmlFor={`tf-${tf.value}`}
+                    className="text-sm text-gray-300 cursor-pointer flex items-center space-x-1"
+                  >
+                    <div 
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: tf.color }}
+                    ></div>
+                    <span>{tf.label}</span>
+                  </label>
+                </div>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500">
+              Выбрано: {settings.chartTimeframes?.length || 0}/3 таймфрейма
             </div>
           </div>
 
@@ -222,13 +281,13 @@ const SettingsPanel = ({
           <div className="flex items-center justify-between bg-gray-700/50 rounded-lg p-2">
             <span className="text-gray-300 text-sm">Автообновление</span>
             <Badge variant="default" className="bg-green-600">
-              Включено (2с)
+              Включено (3с)
             </Badge>
           </div>
 
           {/* Информация */}
           <div className="text-xs text-gray-500 text-center pt-2 border-t border-gray-700">
-            MEXC API • Реальное время • v2.0
+            TradingView Pro • MEXC API • 8 таймфреймов • v3.0
           </div>
         </CardContent>
       </Card>
