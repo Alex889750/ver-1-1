@@ -157,6 +157,30 @@ const SettingsPanel = ({
             <div className="flex flex-wrap gap-2">
               <Button
                 size="sm"
+                variant={settings.sortBy === 'change_15s' && settings.sortOrder === 'desc' ? 'default' : 'outline'}
+                onClick={() => onSettingsChange({
+                  ...settings,
+                  sortBy: 'change_15s',
+                  sortOrder: 'desc'
+                })}
+                className="text-xs"
+              >
+                ⚡ 15с рост
+              </Button>
+              <Button
+                size="sm"
+                variant={settings.sortBy === 'change_30s' && settings.sortOrder === 'desc' ? 'default' : 'outline'}
+                onClick={() => onSettingsChange({
+                  ...settings,
+                  sortBy: 'change_30s',
+                  sortOrder: 'desc'
+                })}
+                className="text-xs"
+              >
+                🔥 30с рост
+              </Button>
+              <Button
+                size="sm"
                 variant={settings.sortBy === 'changePercent24h' && settings.sortOrder === 'desc' ? 'default' : 'outline'}
                 onClick={() => onSettingsChange({
                   ...settings,
