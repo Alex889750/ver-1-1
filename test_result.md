@@ -143,16 +143,16 @@ frontend:
           comment: "Successfully implemented configurable column intervals. Users can now select any of the 16 intervals for the 3 table columns via dropdowns in settings panel"
 
   - task: "History load button UI"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "CompactCryptoScreener.jsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
-        - working: "NA"
+        - working: true
           agent: "main"
-          comment: "Task not yet started - need to add button with loading animation and status display"
+          comment: "Successfully implemented history load button with loading animation and progress display. Button shows progress (e.g. 0/209) during loading and 'Готово' when completed"
 
 metadata:
   created_by: "main_agent"
