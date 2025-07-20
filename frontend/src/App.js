@@ -3,6 +3,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import CompactCryptoScreener from "./components/CompactCryptoScreener";
+import CompactCryptoScreenerMax from "./components/CompactCryptoScreenerMax";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -21,7 +22,15 @@ const Home = () => {
     helloWorldApi();
   }, []);
 
-  return <CompactCryptoScreener />;
+  return (
+    <div className="space-y-8">
+      {/* Оригинальная компактная таблица */}
+      <CompactCryptoScreener />
+      
+      {/* Новая максимальная таблица */}
+      <CompactCryptoScreenerMax />
+    </div>
+  );
 };
 
 function App() {
