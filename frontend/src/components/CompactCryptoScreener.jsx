@@ -539,7 +539,7 @@ const CompactCryptoScreener = () => {
                       <th
                         key={column.key}
                         style={{ width: column.width }}
-                        className={`py-2 px-2 text-gray-300 font-medium cursor-pointer hover:text-white transition-colors ${
+                        className={`py-2 pl-3 pr-2 text-gray-300 font-medium cursor-pointer hover:text-white transition-colors ${
                           column.align === 'right' ? 'text-right' : 
                           column.align === 'center' ? 'text-center' : 'text-left'
                         } ${column.sortable ? 'select-none' : ''}`}
