@@ -679,27 +679,60 @@ const CompactCryptoScreener = () => {
                           {isExpanded && (
                             <tr className="bg-gray-800/30">
                               <td colSpan={columns.length} className="py-4 px-4">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                  {settings.chartTimeframes.map((timeframe) => {
-                                    // Фильтруем свечи только для данного таймфрейма
-                                    const timeframeCandles = (data.candles || []).filter(candle => 
-                                      candle.timeframe === timeframe
-                                    );
-                                    
-                                    return (
-                                      <div key={timeframe} className="space-y-2">
-                                        <TradingViewChart
-                                          candles={timeframeCandles}
-                                          symbol={ticker}
-                                          timeframe={timeframe}
-                                          width={300}
-                                          height={120}
-                                        />
-                                      </div>
-                                    );
-                                  })}
+                                {/* TradingView Professional Chart */}
+                                <div className="mb-4">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h4 className="text-white font-semibold">
+                                      📈 Профессиональный график TradingView - {formatCurrency(ticker)}
+                                    </h4>
+                                    <div className="text-xs text-gray-400">
+                                      Реальные данные с биржи
+                                    </div>
+                                  </div>
+                                  <div className="bg-gray-900/50 rounded-lg overflow-hidden">
+                                    <TradingViewWidget
+                                      symbol={formatTradingViewSymbol(ticker)}
+                                      width="100%"
+                                      height="500px"
+                                      interval="5"
+                                      theme="dark"
+                                    />
+                                  </div>
                                 </div>
-                                <div className="mt-3 text-center">
+                                
+                                {/* Наши собственные мини-графики */}
+                                <div className="border-t border-gray-700 pt-4">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h4 className="text-white font-semibold text-sm">
+                                      📊 Краткосрочные графики (наши данные)
+                                    </h4>
+                                    <div className="text-xs text-gray-400">
+                                      {settings.chartTimeframes.length} активных таймфрейма
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {settings.chartTimeframes.map((timeframe) => {
+                                      // Фильтруем свечи только для данного таймфрейма
+                                      const timeframeCandles = (data.candles || []).filter(candle => 
+                                        candle.timeframe === timeframe
+                                      );
+                                      
+                                      return (
+                                        <div key={timeframe} className="space-y-2">
+                                          <TradingViewChart
+                                            candles={timeframeCandles}
+                                            symbol={ticker}
+                                            timeframe={timeframe}
+                                            width={300}
+                                            height={120}
+                                          />
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                                
+                                <div className="mt-4 text-center">
                                   <Button
                                     size="sm"
                                     variant="outline"
