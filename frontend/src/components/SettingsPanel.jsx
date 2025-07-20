@@ -66,6 +66,22 @@ const SettingsPanel = ({
     });
   };
 
+  const handleSignalThresholdChange = (e) => {
+    const value = Math.max(0.01, Math.min(30, parseFloat(e.target.value) || 1.01));
+    onSettingsChange({
+      ...settings,
+      signalThreshold: value
+    });
+  };
+
+  const handleSignalCandlesCountChange = (e) => {
+    const value = Math.max(3, Math.min(100, parseInt(e.target.value) || 10));
+    onSettingsChange({
+      ...settings,
+      signalCandlesCount: value
+    });
+  };
+
   if (!isOpen) {
     return (
       <div className="fixed top-4 right-4 z-50">
