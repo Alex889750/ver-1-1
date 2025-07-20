@@ -126,6 +126,8 @@ const SettingsPanel = ({
                 >
                   <option value="symbol">Символ</option>
                   <option value="price">Цена</option>
+                  <option value="change_15s">15 секунд</option>
+                  <option value="change_30s">30 секунд</option>
                   <option value="change24h">24ч изменение</option>
                   <option value="changePercent24h">24ч %</option>
                   <option value="volume">Объем</option>
