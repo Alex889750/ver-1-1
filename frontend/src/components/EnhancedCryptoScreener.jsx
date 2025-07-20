@@ -209,6 +209,7 @@ const EnhancedCryptoScreener = () => {
         sort_by: settings.sortBy,
         sort_order: settings.sortOrder,
         timeframes: settings.chartTimeframes.join(','),
+        intervals: settings.tableIntervals.join(','), // Передаем настраиваемые интервалы
       });
       
       if (settings.search) {
