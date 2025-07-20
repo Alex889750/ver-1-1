@@ -23,11 +23,8 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
-      {/* Оригинальная компактная таблица */}
-      <CompactCryptoScreener />
-      
-      {/* Новая максимальная таблица */}
+    <div>
+      {/* Только максимальная таблица с правильной сортировкой по модулю */}
       <CompactCryptoScreenerMax />
     </div>
   );
