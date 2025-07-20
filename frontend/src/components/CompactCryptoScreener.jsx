@@ -37,8 +37,8 @@ const CompactCryptoScreener = () => {
     chartTimeframes: ['30s', '1m', '5m'],
     tableIntervals: ['15s', '30s', '24h'], // Настраиваемые интервалы для колонок
     // Настройки для таблицы сигналов
-    signalThreshold: 1.05, // Порог превышения (5%)
-    signalCandlesCount: 10, // Количество свечей для расчета среднего
+    signalThreshold: 3.0, // Порог превышения (3.0 = отношение 3:1)
+    signalCandlesCount: 6, // Количество свечей для расчета среднего (6 минут)
     showSignalsTable: true // Показывать ли таблицу сигналов
   });
 
