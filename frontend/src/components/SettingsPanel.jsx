@@ -186,6 +186,36 @@ const SettingsPanel = ({
             </div>
           </div>
 
+          {/* Настраиваемые интервалы для колонок таблицы */}
+          <div className="space-y-2">
+            <Label className="text-gray-300 text-sm font-medium">
+              🔧 Интервалы для колонок таблицы
+            </Label>
+            <div className="space-y-2">
+              {settings.tableIntervals?.map((interval, index) => (
+                <div key={`interval-${index}`} className="flex items-center space-x-2">
+                  <span className="text-gray-400 text-xs w-12">
+                    Кол. {index + 1}:
+                  </span>
+                  <select
+                    value={interval}
+                    onChange={(e) => handleTableIntervalChange(index, e.target.value)}
+                    className="flex-1 bg-gray-700 border border-gray-600 text-white text-xs rounded-md px-2 py-1"
+                  >
+                    {availableTableIntervals.map((intervalOption) => (
+                      <option key={intervalOption.value} value={intervalOption.value}>
+                        {intervalOption.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500">
+              Настроенные интервалы: {settings.tableIntervals?.join(', ') || 'Не настроено'}
+            </div>
+          </div>
+
           {/* Настройки таймфреймов графиков */}
           <div className="space-y-2">
             <Label className="text-gray-300 text-sm font-medium">
