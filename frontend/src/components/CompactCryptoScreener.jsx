@@ -694,46 +694,18 @@ const CompactCryptoScreener = () => {
                           {isExpanded && (
                             <tr className="bg-gray-800/30">
                               <td colSpan={columns.length} className="py-4 px-4">
-                                {/* TradingView Professional Charts - 3 графика с разными таймфреймами */}
-                                <div className="mb-4">
+                                {/* Наши графики MEXC с увеличенной высотой */}
+                                <div className="space-y-4">
                                   <div className="flex items-center justify-between mb-3">
                                     <h4 className="text-white font-semibold">
-                                      📈 Профессиональные графики TradingView - {formatCurrency(ticker)}
+                                      📊 Краткосрочные графики - {formatCurrency(ticker)}
                                     </h4>
                                     <div className="text-xs text-gray-400">
-                                      {settings.chartTimeframes.length} активных таймфрейма
+                                      {settings.chartTimeframes.length} активных таймфрейма • MEXC данные
                                     </div>
                                   </div>
                                   
-                                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-                                    {settings.chartTimeframes.map((timeframe, index) => (
-                                      <div key={`tv-${timeframe}`} className="bg-gray-900/50 rounded-lg overflow-hidden">
-                                        <div className="bg-gray-800/70 px-3 py-2 text-xs text-gray-300 font-medium border-b border-gray-700">
-                                          📊 {timeframe} таймфрейм
-                                        </div>
-                                        <TradingViewWidget
-                                          symbol={formatTradingViewSymbol(ticker)}
-                                          width="100%"
-                                          height="350px"
-                                          interval={getTradingViewInterval(timeframe)}
-                                          theme="dark"
-                                        />
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                                
-                                {/* Наши собственные мини-графики */}
-                                <div className="border-t border-gray-700 pt-4">
-                                  <div className="flex items-center justify-between mb-2">
-                                    <h4 className="text-white font-semibold text-sm">
-                                      📊 Краткосрочные графики (MEXC данные)
-                                    </h4>
-                                    <div className="text-xs text-gray-400">
-                                      Собственные данные с MEXC
-                                    </div>
-                                  </div>
-                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {settings.chartTimeframes.map((timeframe) => {
                                       // Фильтруем свечи только для данного таймфрейма
                                       const timeframeCandles = (data.candles || []).filter(candle => 
@@ -747,7 +719,7 @@ const CompactCryptoScreener = () => {
                                             symbol={ticker}
                                             timeframe={timeframe}
                                             width={300}
-                                            height={120}
+                                            height={180}
                                           />
                                         </div>
                                       );
@@ -755,7 +727,7 @@ const CompactCryptoScreener = () => {
                                   </div>
                                 </div>
                                 
-                                <div className="mt-4 text-center">
+                                <div className="mt-6 text-center">
                                   <Button
                                     size="sm"
                                     variant="outline"
