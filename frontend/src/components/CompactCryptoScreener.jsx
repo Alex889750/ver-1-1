@@ -249,6 +249,12 @@ const CompactCryptoScreener = () => {
     }
   }, [settings.signalThreshold, settings.signalCandlesCount, settings.signalTimeframe]);
 
+  const formatTradingViewSymbol = (mexcSymbol) => {
+    // Преобразуем символы MEXC в формат TradingView
+    // Например: BTCUSDT -> MEXC:BTCUSDT или используем Binance как более популярную биржу
+    return `BINANCE:${mexcSymbol}`;
+  };
+
   const getTradingViewInterval = (timeframe) => {
     // Преобразуем наши таймфреймы в интервалы TradingView
     const intervalMap = {
