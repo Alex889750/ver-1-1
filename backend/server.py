@@ -12,11 +12,50 @@ from datetime import datetime
 import asyncio
 from services.mexc_service_optimized import optimized_mexc_service
 from services.price_tracker_advanced import advanced_price_tracker
+from services.historical_data_service import historical_data_service
+from services.price_tracker_with_history import price_tracker_with_history
 from config.tickers import SUPPORTED_TICKERS
 
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# MongoDB connection
+mongo_url = os.environ['MONGO_URL']
+client = AsyncIOMotorClient(mongo_url)
+db = client[os.environ['DB_NAME']]
+
+# Create the main app without a prefix
+app = FastAPI(title="MEXC TradingView Screener API", version="3.1.0")
+
+# Create a router with the /api prefix
+api_router = APIRouter(prefix="/api")
+
+
+# Utility functions
+def convert_interval_to_seconds(interval: str) -> Optional[int]:
+    """Конвертировать интервал в секунды"""
+    interval_map = {
+        '2s': 2, '5s': 5, '10s': 10, '15s': 15, '30s': 30,
+        '1m': 60, '2m': 120, '3m': 180, '5m': 300, '10m': 600,
+        '15m': 900, '20m': 1200, '30m': 1800, '1h': 3600,
+        '4h': 14400, '24h': 86400
+    }
+    return interval_map.get(interval)
+
+def get_price_change_for_interval(track_data: Dict, interval_seconds: int) -> Optional[Dict]:
+    """Получить изменение цены для указанного интервала"""
+    if interval_seconds == 15:
+        return track_data.get("change_15s")
+    elif interval_seconds == 30:
+        return track_data.get("change_30s")
+    elif interval_seconds == 86400:  # 24h
+        # Для 24h возвращаем None, будем использовать данные MEXC
+        return None
+    else:
+        # Для других интервалов пока возвращаем None
+        # В будущем можно добавить более сложную логику
+        return None
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
