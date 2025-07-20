@@ -13,7 +13,8 @@ const SettingsPanel = ({
   onToggle,
   totalTickers = 0,
   activeTickers = 0,
-  availableTimeframes = []
+  availableTimeframes = [],
+  availableTableIntervals = []  // Add this new prop
 }) => {
   const handleDisplayCountChange = (e) => {
     const value = Math.max(1, Math.min(30, parseInt(e.target.value) || 10));
