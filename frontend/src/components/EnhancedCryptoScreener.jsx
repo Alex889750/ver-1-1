@@ -279,17 +279,58 @@ const EnhancedCryptoScreener = () => {
   }, [fetchPrices]);
 
   const handleSort = (columnKey) => {
-    if (columns.find(col => col.key === columnKey)?.sortable) {
-      setSettings(prev => ({
-        ...prev,
-        sortBy: columnKey,
-        sortOrder: prev.sortBy === columnKey && prev.sortOrder === 'asc' ? 'desc' : 'asc'
-      }));
+    const column = columns.find(col => col.key === columnKey);
+    if (!column?.sortable) return;
+    
+    // Определяем реальный ключ для сортировки
+    let realSortKey = columnKey;
+    
+    // Для настраиваемых интервальных колонок используем соответствующий интервал
+    if (columnKey === 'change_interval_0') {
+      const interval = settings.tableIntervals[0];
+      realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+    } else if (columnKey === 'change_interval_1') {
+      const interval = settings.tableIntervals[1]; 
+      realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+    } else if (columnKey === 'change_interval_2') {
+      const interval = settings.tableIntervals[2];
+      realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
     }
+    
+    setSettings(prev => ({
+      ...prev,
+      sortBy: realSortKey,
+      sortOrder: prev.sortBy === realSortKey && prev.sortOrder === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+  
+  // Функция для конвертации интервала в секунды (frontend версия)
+  const convert_interval_to_seconds_frontend = (interval) => {
+    const interval_map = {
+      '2s': 2, '5s': 5, '10s': 10, '15s': 15, '30s': 30,
+      '1m': 60, '2m': 120, '3m': 180, '5m': 300, '10m': 600,
+      '15m': 900, '20m': 1200, '30m': 1800, '1h': 3600,
+      '4h': 14400, '24h': 86400
+    };
+    return interval_map[interval] || 15;
   };
 
   const getSortIcon = (columnKey) => {
-    if (settings.sortBy !== columnKey) return '↕️';
+    // Определяем реальный ключ для сортировки
+    let realSortKey = columnKey;
+    
+    if (columnKey === 'change_interval_0') {
+      const interval = settings.tableIntervals[0];
+      realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+    } else if (columnKey === 'change_interval_1') {
+      const interval = settings.tableIntervals[1];
+      realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+    } else if (columnKey === 'change_interval_2') {
+      const interval = settings.tableIntervals[2];
+      realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+    }
+    
+    if (settings.sortBy !== realSortKey) return '↕️';
     return settings.sortOrder === 'asc' ? '↑' : '↓';
   };
 
