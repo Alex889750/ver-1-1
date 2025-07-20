@@ -607,16 +607,13 @@ const CompactCryptoScreener = () => {
                             })}
                             
                             <td className="py-2 px-2 text-right">
-                              <Badge 
-                                variant={data.changePercent24h >= 0 ? "default" : "destructive"}
-                                className={`font-mono text-xs px-2 py-1 ${
-                                  data.changePercent24h >= 0 
-                                    ? 'bg-green-600/80' 
-                                    : 'bg-red-600/80'
-                                }`}
-                              >
+                              <span className={`font-mono text-sm ${
+                                data.changePercent24h >= 0 
+                                  ? 'text-green-400' 
+                                  : 'text-red-400'
+                              }`}>
                                 {data.changePercent24h > 0 ? '+' : ''}{data.changePercent24h.toFixed(2)}%
-                              </Badge>
+                              </span>
                             </td>
                             
                             <td className="py-2 px-2 text-right">
