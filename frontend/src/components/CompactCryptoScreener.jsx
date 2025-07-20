@@ -694,24 +694,32 @@ const CompactCryptoScreener = () => {
                           {isExpanded && (
                             <tr className="bg-gray-800/30">
                               <td colSpan={columns.length} className="py-4 px-4">
-                                {/* TradingView Professional Chart */}
+                                {/* TradingView Professional Charts - 3 графика с разными таймфреймами */}
                                 <div className="mb-4">
-                                  <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center justify-between mb-3">
                                     <h4 className="text-white font-semibold">
-                                      📈 Профессиональный график TradingView - {formatCurrency(ticker)}
+                                      📈 Профессиональные графики TradingView - {formatCurrency(ticker)}
                                     </h4>
                                     <div className="text-xs text-gray-400">
-                                      Реальные данные с биржи
+                                      {settings.chartTimeframes.length} активных таймфрейма
                                     </div>
                                   </div>
-                                  <div className="bg-gray-900/50 rounded-lg overflow-hidden">
-                                    <TradingViewWidget
-                                      symbol={formatTradingViewSymbol(ticker)}
-                                      width="100%"
-                                      height="500px"
-                                      interval="5"
-                                      theme="dark"
-                                    />
+                                  
+                                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                                    {settings.chartTimeframes.map((timeframe, index) => (
+                                      <div key={`tv-${timeframe}`} className="bg-gray-900/50 rounded-lg overflow-hidden">
+                                        <div className="bg-gray-800/70 px-3 py-2 text-xs text-gray-300 font-medium border-b border-gray-700">
+                                          📊 {timeframe} таймфрейм
+                                        </div>
+                                        <TradingViewWidget
+                                          symbol={formatTradingViewSymbol(ticker)}
+                                          width="100%"
+                                          height="350px"
+                                          interval={getTradingViewInterval(timeframe)}
+                                          theme="dark"
+                                        />
+                                      </div>
+                                    ))}
                                   </div>
                                 </div>
                                 
@@ -719,10 +727,10 @@ const CompactCryptoScreener = () => {
                                 <div className="border-t border-gray-700 pt-4">
                                   <div className="flex items-center justify-between mb-2">
                                     <h4 className="text-white font-semibold text-sm">
-                                      📊 Краткосрочные графики (наши данные)
+                                      📊 Краткосрочные графики (MEXC данные)
                                     </h4>
                                     <div className="text-xs text-gray-400">
-                                      {settings.chartTimeframes.length} активных таймфрейма
+                                      Собственные данные с MEXC
                                     </div>
                                   </div>
                                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
