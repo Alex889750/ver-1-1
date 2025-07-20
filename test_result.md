@@ -118,16 +118,16 @@ backend:
           comment: "Successfully implemented backend support for configurable intervals. API now accepts interval_configs parameter and returns dynamic interval data"
 
   - task: "History load endpoint"
-    implemented: false
-    working: "NA"
-    file: "server.py"
+    implemented: true
+    working: true
+    file: "server.py, historical_data_service.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
-        - working: "NA"
+        - working: true
           agent: "main"
-          comment: "Task not yet started - need to create endpoint for loading historical candle data"
+          comment: "Successfully implemented history loading endpoints. POST /api/crypto/load-history starts background loading and GET /api/crypto/history-status returns progress"
 
 frontend:
   - task: "Configurable column intervals UI"
