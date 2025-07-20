@@ -435,6 +435,7 @@ const CompactCryptoScreener = () => {
         activeTickers={activeTickers}
         availableTimeframes={availableTimeframes}
         availableTableIntervals={availableTableIntervals}
+        availableSignalTimeframes={availableSignalTimeframes}
       />
 
       <div className="max-w-full mx-auto">
