@@ -204,6 +204,8 @@ async def get_crypto_prices(
             "change24h": lambda x: x[1].change24h,
             "changePercent24h": lambda x: x[1].changePercent24h,
             "volume": lambda x: x[1].volume,
+            "change_15s": lambda x: x[1].change_15s.percent_change if x[1].change_15s else 0,
+            "change_30s": lambda x: x[1].change_30s.percent_change if x[1].change_30s else 0,
         }
         
         if sort_by in sort_key_map:
