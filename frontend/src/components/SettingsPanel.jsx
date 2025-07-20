@@ -315,19 +315,40 @@ const SettingsPanel = ({
             {/* Количество свечей */}
             <div className="space-y-1">
               <Label className="text-gray-300 text-xs">
-                Количество свечей для среднего (3-100)
+                Количество свечей для среднего (1-100)
               </Label>
               <Input
                 type="number"
-                min="3"
+                min="1"
                 max="100"
-                value={settings.signalCandlesCount || 10}
+                value={settings.signalCandlesCount || 6}
                 onChange={handleSignalCandlesCountChange}
                 className="bg-gray-700 border-gray-600 text-white text-sm"
-                placeholder="10"
+                placeholder="6"
               />
               <div className="text-xs text-gray-500">
-                Среднее из последних {settings.signalCandlesCount || 10} свечей
+                Среднее из последних {settings.signalCandlesCount || 6} свечей
+              </div>
+            </div>
+
+            {/* Таймфрейм для сигналов */}
+            <div className="space-y-1">
+              <Label className="text-gray-300 text-xs">
+                Таймфрейм свечей для анализа
+              </Label>
+              <select
+                value={settings.signalTimeframe || '1m'}
+                onChange={handleSignalTimeframeChange}
+                className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-md px-2 py-1"
+              >
+                {availableSignalTimeframes.map((tf) => (
+                  <option key={tf.value} value={tf.value}>
+                    {tf.label}
+                  </option>
+                ))}
+              </select>
+              <div className="text-xs text-gray-500">
+                Текущий таймфрейм: {availableSignalTimeframes.find(tf => tf.value === settings.signalTimeframe)?.label || '1 мин'}
               </div>
             </div>
           </div>
