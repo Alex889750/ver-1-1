@@ -126,7 +126,26 @@ const EnhancedCryptoScreener = () => {
     return 'text-gray-500';
   }, []);
 
-  const formatShortTermChange = useCallback((changeData) => {
+  // Получаем изменение цены для настраиваемого интервала
+  const getCustomIntervalChange = useCallback((data, intervalValue) => {
+    const interval = availableTableIntervals.find(i => i.value === intervalValue);
+    if (!interval) return { text: 'N/A', color: 'text-gray-500' };
+    
+    // Для 24h используем данные MEXC
+    if (intervalValue === '24h') {
+      const percent_change = data.changePercent24h || 0;
+      const color = getPriceChangeColor(percent_change);
+      const sign = percent_change > 0 ? '+' : '';
+      return {
+        text: `${sign}${percent_change.toFixed(2)}%`,
+        color
+      };
+    }
+    
+    // Для других интервалов используем динамически вычисленные данные
+    const changeKey = `change_${interval.seconds}s`;
+    const changeData = data[changeKey];
+    
     if (!changeData) {
       return { text: 'N/A', color: 'text-gray-500' };
     }
@@ -139,7 +158,7 @@ const EnhancedCryptoScreener = () => {
       text: `${sign}${percent_change.toFixed(2)}%`,
       color
     };
-  }, [getPriceChangeColor]);
+  }, [availableTableIntervals, getPriceChangeColor]);
 
   // Проверка соответствия кастомным фильтрам
   const passesCustomFilters = useCallback((data) => {
