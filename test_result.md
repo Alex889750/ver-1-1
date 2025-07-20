@@ -101,3 +101,73 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Re-implement 'configurable intervals for the 3 columns' and 'history load button' features that were previously working but lost due to revert to stable version. The user wants to restore these two specific features from the stable baseline."
+
+backend:
+  - task: "Support configurable intervals for table columns"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Task not yet started - need to modify backend API to support interval_configs parameter"
+
+  - task: "History load endpoint"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Task not yet started - need to create endpoint for loading historical candle data"
+
+frontend:
+  - task: "Configurable column intervals UI"
+    implemented: false
+    working: "NA"
+    file: "CompactCryptoScreener.jsx, SettingsPanel.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Task not yet started - need to add dropdowns for selecting 3 table column intervals"
+
+  - task: "History load button UI"
+    implemented: false
+    working: "NA"
+    file: "CompactCryptoScreener.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Task not yet started - need to add button with loading animation and status display"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Support configurable intervals for table columns"
+    - "Configurable column intervals UI"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Starting implementation of configurable columns feature first, then history load button. Will modify backend API to support interval_configs parameter and update frontend to show dynamic columns."
