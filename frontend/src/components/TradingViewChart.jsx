@@ -4,11 +4,19 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
   const chartData = useMemo(() => {
     if (!candles || candles.length === 0) return null;
 
-    const validCandles = candles.filter(candle => 
+    // Фильтруем свечи по таймфрейму для дополнительной уверенности
+    const timeframeCandles = candles.filter(candle => 
+      candle.timeframe === timeframe
+    );
+
+    const validCandles = timeframeCandles.filter(candle => 
       candle.open > 0 && candle.high > 0 && candle.low > 0 && candle.close > 0
     );
 
     if (validCandles.length === 0) return null;
+
+    // Логирование для отладки
+    console.log(`Chart ${symbol} ${timeframe}: ${validCandles.length} candles`, validCandles.slice(-3));
 
     // Находим min и max значения для масштабирования
     const allPrices = validCandles.flatMap(candle => [candle.high, candle.low]);
@@ -30,7 +38,7 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
       adjustedMax,
       adjustedRange
     };
-  }, [candles]);
+  }, [candles, timeframe, symbol]);
 
   if (!chartData) {
     return (
