@@ -239,6 +239,11 @@ const CompactCryptoScreener = () => {
         setActiveTickers(response.data.count);
         setConnectionStatus('connected');
         setIsLoading(false);
+        
+        // Рассчитываем сигналы если включена таблица сигналов
+        if (settings.showSignalsTable) {
+          calculateSignals(response.data.data);
+        }
       }
     } catch (err) {
       console.error('Error fetching prices:', err);
