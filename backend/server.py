@@ -293,7 +293,54 @@ async def get_crypto_prices(
             detail=f"Failed to fetch crypto prices: {str(e)}"
         )
 
-@api_router.post("/status", response_model=StatusCheck)
+@api_router.post("/crypto/load-history")
+async def load_history():
+    """
+    Загрузить исторические данные для всех активных тикеров для поддерживаемых таймфреймов
+    """
+    try:
+        from services.historical_data_service import load_historical_data_for_all_tickers
+        
+        # Запускаем загрузку исторических данных в фоновом режиме
+        asyncio.create_task(load_historical_data_for_all_tickers())
+        
+        return {
+            "status": "started",
+            "message": "Загрузка исторических данных запущена",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logging.error(f"Error starting history load: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to start history load: {str(e)}"
+        )
+
+@api_router.get("/crypto/history-status")
+async def get_history_status():
+    """
+    Получить статус загрузки исторических данных
+    """
+    try:
+        from services.historical_data_service import get_history_load_status
+        
+        status = get_history_load_status()
+        return {
+            "status": status.get("status", "idle"),
+            "progress": status.get("progress", 0),
+            "total": status.get("total", 0),
+            "current_symbol": status.get("current_symbol", ""),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logging.error(f"Error getting history status: {str(e)}")
+        return {
+            "status": "error",
+            "progress": 0,
+            "total": 0,
+            "current_symbol": "",
+            "timestamp": datetime.utcnow().isoformat()
+        }
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.dict()
     status_obj = StatusCheck(**status_dict)
