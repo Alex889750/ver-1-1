@@ -202,6 +202,39 @@ const EnhancedCryptoScreener = () => {
     return true;
   }, [settings.customFilters]);
 
+  const loadHistoricalData = async () => {
+    try {
+      setHistoryLoading(true);
+      const response = await axios.post(`${API}/crypto/load-history`);
+      
+      if (response.data && response.data.success) {
+        setHistoryLoaded(true);
+        // Обновляем данные после загрузки истории
+        await fetchPrices();
+      }
+    } catch (err) {
+      console.error('Error loading historical data:', err);
+      setError('Ошибка загрузки исторических данных');
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const checkHistoryStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/crypto/history-status`);
+      if (response.data) {
+        setHistoryLoaded(response.data.historical_data_loaded);
+      }
+    } catch (err) {
+      console.error('Error checking history status:', err);
+    }
+  };
+
+  useEffect(() => {
+    checkHistoryStatus();
+  }, []);
+
   const fetchPrices = useCallback(async () => {
     try {
       setError(null);
