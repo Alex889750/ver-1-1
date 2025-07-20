@@ -21,6 +21,12 @@ const CompactCryptoScreener = () => {
   const [expandedRows, setExpandedRows] = useState(new Set());
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [historyStatus, setHistoryStatus] = useState({
+    status: 'idle',
+    progress: 0,
+    total: 0,
+    current_symbol: ''
+  });
   
   // Настройки с поддержкой настраиваемых интервалов колонок
   const [settings, setSettings] = useState({
