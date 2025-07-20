@@ -431,22 +431,28 @@ const EnhancedCryptoScreener = () => {
             <div className="text-blue-400 text-sm font-bold">{totalTickers}</div>
           </div>
           <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
-            <div className="text-gray-400 text-xs">Сортировка</div>
-            <div className="text-green-400 text-sm">{settings.sortBy} {getSortIcon(settings.sortBy)}</div>
+            <div className="text-gray-400 text-xs">Интервалы</div>
+            <div className="text-green-400 text-sm">
+              {settings.tableIntervals ? settings.tableIntervals.map(i => 
+                availableTableIntervals.find(opt => opt.value === i)?.label.split(' ')[0] || i
+              ).join(', ') : '15с, 30с, 24ч'}
+            </div>
           </div>
           <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
             <div className="text-gray-400 text-xs">Графики</div>
             <div className="text-purple-400 text-sm">{settings.chartTimeframes.length} TF</div>
           </div>
           <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
+            <div className="text-gray-400 text-xs">История</div>
+            <div className={`text-sm font-bold ${historyLoaded ? 'text-green-400' : 'text-yellow-400'}`}>
+              {historyLoaded ? '✅ Да' : '⏳ Нет'}
+            </div>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
             <div className="text-gray-400 text-xs">Фильтры</div>
             <div className="text-orange-400 text-sm">
               {settings.customFilters.filter(f => f.interval !== 'none').length}/3
             </div>
-          </div>
-          <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
-            <div className="text-gray-400 text-xs">Поиск</div>
-            <div className="text-yellow-400 text-sm">{settings.search || 'Все'}</div>
           </div>
         </div>
 
