@@ -75,10 +75,17 @@ const SettingsPanel = ({
   };
 
   const handleSignalCandlesCountChange = (e) => {
-    const value = Math.max(3, Math.min(100, parseInt(e.target.value) || 10));
+    const value = Math.max(1, Math.min(100, parseInt(e.target.value) || 6));
     onSettingsChange({
       ...settings,
       signalCandlesCount: value
+    });
+  };
+
+  const handleSignalTimeframeChange = (e) => {
+    onSettingsChange({
+      ...settings,
+      signalTimeframe: e.target.value
     });
   };
 
