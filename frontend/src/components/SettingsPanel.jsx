@@ -264,6 +264,66 @@ const SettingsPanel = ({
             </div>
           </div>
 
+          {/* Настройки таблицы сигналов */}
+          <div className="space-y-2">
+            <Label className="text-gray-300 text-sm font-medium">
+              🚨 Настройки таблицы сигналов
+            </Label>
+            
+            {/* Включение/выключение таблицы сигналов */}
+            <div className="flex items-center justify-between bg-gray-700/50 rounded-lg p-2">
+              <span className="text-gray-300 text-sm">Показать таблицу сигналов</span>
+              <Checkbox
+                id="show-signals-table"
+                checked={settings.showSignalsTable || false}
+                onCheckedChange={(checked) => onSettingsChange({
+                  ...settings,
+                  showSignalsTable: checked
+                })}
+                className="border-gray-600"
+              />
+            </div>
+
+            {/* Порог превышения */}
+            <div className="space-y-1">
+              <Label className="text-gray-300 text-xs">
+                Порог превышения (1.01 - 30.00)
+              </Label>
+              <Input
+                type="number"
+                min="1.01"
+                max="30.00"
+                step="0.01"
+                value={settings.signalThreshold || 1.05}
+                onChange={handleSignalThresholdChange}
+                className="bg-gray-700 border-gray-600 text-white text-sm"
+                placeholder="1.05"
+              />
+              <div className="text-xs text-gray-500">
+                Текущий порог: {((settings.signalThreshold || 1.05) - 1) * 100}% превышение
+              </div>
+            </div>
+
+            {/* Количество свечей */}
+            <div className="space-y-1">
+              <Label className="text-gray-300 text-xs">
+                Количество свечей для среднего (3-100)
+              </Label>
+              <Input
+                type="number"
+                min="3"
+                max="100"
+                value={settings.signalCandlesCount || 10}
+                onChange={handleSignalCandlesCountChange}
+                className="bg-gray-700 border-gray-600 text-white text-sm"
+                placeholder="10"
+              />
+              <div className="text-xs text-gray-500">
+                Среднее из последних {settings.signalCandlesCount || 10} свечей
+              </div>
+            </div>
+          </div>
+
           {/* Быстрые фильтры */}
           <div className="space-y-2">
             <Label className="text-gray-300 text-sm font-medium">
