@@ -116,6 +116,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Successfully implemented backend support for configurable intervals. API now accepts interval_configs parameter and returns dynamic interval data"
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: All configurable interval tests passed. API correctly accepts interval_configs parameter (e.g., '15s,30s,24h'), returns proper change_interval_0/1/2 fields, supports various interval combinations (2s,5m,1h), and enables sorting by interval columns. Tested with 4 different interval configurations - all working perfectly."
 
   - task: "History load endpoint"
     implemented: true
@@ -128,6 +131,9 @@ backend:
         - working: true
           agent: "main"
           comment: "Successfully implemented history loading endpoints. POST /api/crypto/load-history starts background loading and GET /api/crypto/history-status returns progress"
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: History loading endpoints working correctly. POST /api/crypto/load-history successfully starts background loading and returns 'started' status. GET /api/crypto/history-status properly returns status (idle/loading/completed), progress (X/209), total count, and current_symbol. Status transitions work as expected from idle→loading with progress tracking."
 
 frontend:
   - task: "Configurable column intervals UI"
