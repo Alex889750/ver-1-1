@@ -777,6 +777,9 @@ const CompactCryptoScreener = () => {
                               <div className="text-xs text-gray-500 font-mono">
                                 {signal.lastMinuteChange} / {signal.averageChange}
                               </div>
+                              <div className="text-xs text-gray-400">
+                                {signal.trendDirection} усилен
+                              </div>
                             </div>
                           </td>
                         </tr>
