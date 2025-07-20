@@ -414,29 +414,37 @@ const CompactCryptoScreenerMax = () => {
   const dataArray = useMemo(() => {
     const entries = Object.entries(priceData);
     
+    console.log("Debugging sort logic..."); // Для отладки
+    
     // Сортируем по максимальному абсолютному значению среди всех интервальных колонок
     return entries.sort((a, b) => {
-      const [, dataA] = a;
-      const [, dataB] = b;
+      const [tickerA, dataA] = a;
+      const [tickerB, dataB] = b;
       
       // Получаем максимальное абсолютное значение среди всех интервалов
-      const getMaxAbsValue = (data) => {
+      const getMaxAbsValue = (data, ticker) => {
         const values = [];
         
         // Проверяем все настраиваемые интервалы (change_interval_0, change_interval_1, change_interval_2)
         for (let i = 0; i < 3; i++) {
           const changeData = data[`change_interval_${i}`];
-          if (changeData && typeof changeData.percent_change === 'number') {
+          if (changeData && typeof changeData.percent_change === 'number' && !isNaN(changeData.percent_change)) {
             values.push(Math.abs(changeData.percent_change));
           }
         }
         
-        // Возвращаем максимальное абсолютное значение, или 0 если нет данных
-        return values.length > 0 ? Math.max(...values) : 0;
+        const maxValue = values.length > 0 ? Math.max(...values) : 0;
+        
+        // Отладочная информация для первых 5 тикеров
+        if (values.length > 0) {
+          console.log(`${ticker}: intervals=[${values.map(v => v.toFixed(2)).join(', ')}], max=${maxValue.toFixed(2)}`);
+        }
+        
+        return maxValue;
       };
       
-      const maxAbsA = getMaxAbsValue(dataA);
-      const maxAbsB = getMaxAbsValue(dataB);
+      const maxAbsA = getMaxAbsValue(dataA, tickerA);
+      const maxAbsB = getMaxAbsValue(dataB, tickerB);
       
       // Сортируем по убыванию абсолютных значений (большие значения сверху)
       return maxAbsB - maxAbsA;
