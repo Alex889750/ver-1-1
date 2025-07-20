@@ -159,10 +159,11 @@ async def get_supported_tickers():
 async def get_crypto_prices(
     limit: Optional[int] = Query(default=20, ge=1, le=50, description="Number of tickers to return"),
     offset: Optional[int] = Query(default=0, ge=0, description="Offset for pagination"),
-    sort_by: Optional[str] = Query(default="symbol", description="Sort by: symbol, price, changePercent24h, volume, change_15s, change_30s"),
+    sort_by: Optional[str] = Query(default="symbol", description="Sort by: symbol, price, changePercent24h, volume, change_15s, change_30s, change_interval_0, change_interval_1, change_interval_2"),
     sort_order: Optional[str] = Query(default="asc", description="Sort order: asc, desc"),
     search: Optional[str] = Query(default=None, description="Search filter for symbol names"),
-    timeframes: Optional[str] = Query(default="15s,30s,1m", description="Comma-separated list of timeframes")
+    timeframes: Optional[str] = Query(default="15s,30s,1m", description="Comma-separated list of timeframes"),
+    interval_configs: Optional[str] = Query(default="15s,30s,24h", description="Comma-separated list of 3 intervals for table columns")
 ):
     """
     Получить актуальные цены криптовалют с продвинутыми графиками
