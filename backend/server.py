@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Query
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -10,8 +10,9 @@ from typing import List, Dict, Optional
 import uuid
 from datetime import datetime
 import asyncio
-from services.mexc_service import mexc_service
-from services.price_tracker import price_tracker
+from services.mexc_service_optimized import optimized_mexc_service
+from services.price_tracker_optimized import optimized_price_tracker
+from config.tickers import SUPPORTED_TICKERS
 
 
 ROOT_DIR = Path(__file__).parent
@@ -23,7 +24,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI()
+app = FastAPI(title="MEXC Crypto Screener API - Optimized", version="2.0.0")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -73,39 +74,42 @@ class CryptoPricesResponse(BaseModel):
     data: Dict[str, CryptoPrice]
     timestamp: str
     count: int
+    total_available: int
 
-# Список поддерживаемых тикеров
-SUPPORTED_TICKERS = [
-    "LTCUSDT", "SHIBUSDT", "AVAXUSDT", "LINKUSDT", "BCHUSDT",
-    "ATOMUSDT", "XMRUSDT", "APTUSDT", "FILUSDT", "NEARUSDT"
-]
+class TickersListResponse(BaseModel):
+    tickers: List[str]
+    count: int
+    timestamp: str
 
 # Фоновая задача для сбора данных
 background_task_running = False
 
 async def background_price_collection():
-    """Фоновая задача для сбора ценовых данных"""
+    """Оптимизированная фоновая задача для сбора ценовых данных"""
     global background_task_running
     background_task_running = True
     
-    logger.info("Starting background price collection...")
+    logger.info(f"Starting optimized background price collection for {len(SUPPORTED_TICKERS)} tickers...")
     
     while background_task_running:
         try:
-            # Получаем данные от MEXC
-            raw_data = await mexc_service.get_multiple_tickers(SUPPORTED_TICKERS)
+            # Получаем все данные одним запросом (намного эффективнее!)
+            raw_data = await optimized_mexc_service.get_filtered_tickers(SUPPORTED_TICKERS)
             
             # Обновляем трекер цен
+            valid_updates = 0
             for symbol, ticker_data in raw_data.items():
                 if 'error' not in ticker_data:
                     try:
                         price = float(ticker_data.get("lastPrice", 0))
                         volume = float(ticker_data.get("volume", 0))
-                        price_tracker.add_price_point(symbol, price, volume)
+                        if price > 0:  # Только валидные цены
+                            optimized_price_tracker.add_price_point(symbol, price, volume)
+                            valid_updates += 1
                     except (ValueError, TypeError):
-                        logger.warning(f"Invalid price data for {symbol}")
+                        continue
             
-            logger.debug("Background price collection completed")
+            logger.debug(f"Updated {valid_updates}/{len(raw_data)} tickers successfully")
             
         except Exception as e:
             logger.error(f"Error in background price collection: {str(e)}")
@@ -116,35 +120,63 @@ async def background_price_collection():
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "MEXC Crypto Screener API"}
+    return {
+        "message": "MEXC Crypto Screener API - Optimized v2.0",
+        "features": [
+            "250+ tickers support",
+            "Batch API optimization", 
+            "Real-time candle charts",
+            "Short-term price tracking",
+            "Configurable display settings"
+        ]
+    }
 
 @api_router.get("/health")
 async def health_check():
-    """Проверка работоспособности API"""
+    """Проверка работоспособности оптимизированного API"""
+    active_symbols = optimized_price_tracker.get_active_symbols_count()
+    
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
-        "supported_tickers": SUPPORTED_TICKERS,
-        "background_task_running": background_task_running
+        "total_supported_tickers": len(SUPPORTED_TICKERS),
+        "active_symbols": active_symbols,
+        "background_task_running": background_task_running,
+        "optimization": "enabled"
     }
 
+@api_router.get("/tickers", response_model=TickersListResponse)
+async def get_supported_tickers():
+    """Получить список всех поддерживаемых тикеров"""
+    return TickersListResponse(
+        tickers=SUPPORTED_TICKERS,
+        count=len(SUPPORTED_TICKERS),
+        timestamp=datetime.utcnow().isoformat()
+    )
+
 @api_router.get("/crypto/prices", response_model=CryptoPricesResponse)
-async def get_crypto_prices():
+async def get_crypto_prices(
+    limit: Optional[int] = Query(default=30, ge=1, le=50, description="Number of tickers to return"),
+    offset: Optional[int] = Query(default=0, ge=0, description="Offset for pagination"),
+    sort_by: Optional[str] = Query(default="symbol", description="Sort by: symbol, price, change24h, changePercent24h, volume"),
+    sort_order: Optional[str] = Query(default="asc", description="Sort order: asc, desc"),
+    search: Optional[str] = Query(default=None, description="Search filter for symbol names")
+):
     """
-    Получить актуальные цены всех поддерживаемых криптовалют с короткими интервалами
+    Получить актуальные цены криптовалют с поддержкой пагинации, сортировки и поиска
     """
     try:
         # Получаем данные от MEXC API
-        raw_data = await mexc_service.get_multiple_tickers(SUPPORTED_TICKERS)
+        raw_data = await optimized_mexc_service.get_filtered_tickers(SUPPORTED_TICKERS)
         
         # Получаем данные из трекера цен
-        tracked_data = price_tracker.get_all_symbols_data()
+        tracked_data = optimized_price_tracker.get_symbols_batch_data(list(raw_data.keys()))
         
         # Форматируем данные
-        formatted_data = {}
+        formatted_data = []
         for symbol, ticker_data in raw_data.items():
             # Базовые данные от MEXC
-            formatted_ticker = mexc_service.format_ticker_data(ticker_data)
+            formatted_ticker = optimized_mexc_service.format_ticker_data(ticker_data)
             
             # Дополняем данными из трекера
             if symbol in tracked_data:
@@ -155,12 +187,43 @@ async def get_crypto_prices():
                     "candles": track_data.get("candles", [])
                 })
             
-            formatted_data[symbol] = CryptoPrice(**formatted_ticker)
+            formatted_data.append((symbol, CryptoPrice(**formatted_ticker)))
+        
+        # Применяем поиск
+        if search:
+            search_upper = search.upper()
+            formatted_data = [
+                (symbol, data) for symbol, data in formatted_data 
+                if search_upper in symbol or search_upper in symbol.replace('USDT', '')
+            ]
+        
+        # Сортировка
+        sort_key_map = {
+            "symbol": lambda x: x[1].symbol,
+            "price": lambda x: x[1].price,
+            "change24h": lambda x: x[1].change24h,
+            "changePercent24h": lambda x: x[1].changePercent24h,
+            "volume": lambda x: x[1].volume,
+        }
+        
+        if sort_by in sort_key_map:
+            formatted_data.sort(
+                key=sort_key_map[sort_by], 
+                reverse=(sort_order.lower() == "desc")
+            )
+        
+        # Пагинация
+        total_available = len(formatted_data)
+        paginated_data = formatted_data[offset:offset + limit]
+        
+        # Формируем финальный ответ
+        result_data = {symbol: data for symbol, data in paginated_data}
         
         response = CryptoPricesResponse(
-            data=formatted_data,
+            data=result_data,
             timestamp=datetime.utcnow().isoformat(),
-            count=len(formatted_data)
+            count=len(result_data),
+            total_available=total_available
         )
         
         return response
@@ -178,25 +241,29 @@ async def get_single_crypto_price(symbol: str):
     Получить актуальную цену конкретной криптовалюты
     """
     try:
-        # Проверяем, что символ поддерживается
-        if symbol.upper() not in SUPPORTED_TICKERS:
+        symbol_upper = symbol.upper()
+        if not symbol_upper.endswith('USDT'):
+            symbol_upper += 'USDT'
+            
+        if symbol_upper not in SUPPORTED_TICKERS:
             raise HTTPException(
                 status_code=400, 
-                detail=f"Symbol {symbol} not supported. Supported symbols: {SUPPORTED_TICKERS}"
+                detail=f"Symbol {symbol} not supported. Use /tickers endpoint to see all supported symbols."
             )
         
         # Получаем данные от MEXC API
-        raw_data = await mexc_service.get_24hr_ticker(symbol.upper())
+        all_data = await optimized_mexc_service.get_filtered_tickers([symbol_upper])
+        raw_data = all_data.get(symbol_upper, {})
         
         # Получаем данные из трекера цен
-        tracked_data = price_tracker.get_all_symbols_data()
+        tracked_data = optimized_price_tracker.get_symbols_batch_data([symbol_upper])
         
         # Форматируем данные
-        formatted_data = mexc_service.format_ticker_data(raw_data)
+        formatted_data = optimized_mexc_service.format_ticker_data(raw_data)
         
         # Дополняем данными из трекера
-        if symbol.upper() in tracked_data:
-            track_data = tracked_data[symbol.upper()]
+        if symbol_upper in tracked_data:
+            track_data = tracked_data[symbol_upper]
             formatted_data.update({
                 "change_15s": track_data.get("change_15s"),
                 "change_30s": track_data.get("change_30s"),
@@ -217,36 +284,6 @@ async def get_single_crypto_price(symbol: str):
         raise HTTPException(
             status_code=500, 
             detail=f"Failed to fetch price for {symbol}: {str(e)}"
-        )
-
-@api_router.get("/crypto/candles/{symbol}")
-async def get_candles(symbol: str, limit: int = 20):
-    """
-    Получить свечные данные для символа
-    """
-    try:
-        if symbol.upper() not in SUPPORTED_TICKERS:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Symbol {symbol} not supported"
-            )
-        
-        candles = price_tracker.get_candles(symbol.upper(), limit)
-        
-        return {
-            "symbol": symbol.upper(),
-            "candles": candles,
-            "count": len(candles),
-            "timestamp": datetime.utcnow().isoformat()
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logging.error(f"Error fetching candles for {symbol}: {str(e)}")
-        raise HTTPException(
-            status_code=500, 
-            detail=f"Failed to fetch candles for {symbol}: {str(e)}"
         )
 
 @api_router.post("/status", response_model=StatusCheck)
@@ -282,7 +319,8 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def startup_event():
     """Инициализация при запуске приложения"""
-    logger.info("MEXC Crypto Screener API starting up...")
+    logger.info("MEXC Crypto Screener API v2.0 starting up...")
+    logger.info(f"Configured {len(SUPPORTED_TICKERS)} tickers for tracking")
     
     # Запускаем фоновую задачу сбора данных
     asyncio.create_task(background_price_collection())
@@ -292,7 +330,7 @@ async def startup_event():
         while True:
             await asyncio.sleep(600)  # 10 минут
             try:
-                price_tracker.cleanup_old_data()
+                optimized_price_tracker.cleanup_old_data()
                 logger.info("Old data cleanup completed")
             except Exception as e:
                 logger.error(f"Error during cleanup: {str(e)}")
@@ -305,6 +343,6 @@ async def shutdown_event():
     global background_task_running
     background_task_running = False
     
-    logger.info("MEXC Crypto Screener API shutting down...")
-    await mexc_service.close_session()
+    logger.info("MEXC Crypto Screener API v2.0 shutting down...")
+    await optimized_mexc_service.close_session()
     client.close()
