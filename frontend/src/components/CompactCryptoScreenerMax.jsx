@@ -531,7 +531,7 @@ const CompactCryptoScreenerMax = () => {
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <CardTitle className="text-white text-xl">
-                Максимальная таблица • {activeTickers} тикеров
+                📊 Максимальная таблица • {activeTickers} тикеров • Сортировка по max|%|
               </CardTitle>
               <Button
                 variant="outline"
