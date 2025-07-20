@@ -287,20 +287,20 @@ const SettingsPanel = ({
             {/* Порог превышения */}
             <div className="space-y-1">
               <Label className="text-gray-300 text-xs">
-                Порог превышения (1.01 - 30.00)
+                Порог отношения процентов (1.0 - 50.0)
               </Label>
               <Input
                 type="number"
-                min="1.01"
-                max="30.00"
-                step="0.01"
-                value={settings.signalThreshold || 1.05}
+                min="1.0"
+                max="50.0"
+                step="0.1"
+                value={settings.signalThreshold || 3.0}
                 onChange={handleSignalThresholdChange}
                 className="bg-gray-700 border-gray-600 text-white text-sm"
-                placeholder="1.05"
+                placeholder="3.0"
               />
               <div className="text-xs text-gray-500">
-                Текущий порог: {((settings.signalThreshold || 1.05) - 1) * 100}% превышение
+                Пример: при пороге {settings.signalThreshold || 3.0} сигнал если последняя минута в {(settings.signalThreshold || 3.0)}x сильнее среднего
               </div>
             </div>
 
