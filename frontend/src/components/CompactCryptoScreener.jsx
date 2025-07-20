@@ -173,8 +173,8 @@ const CompactCryptoScreener = () => {
     });
     
     Object.entries(data).forEach(([ticker, tickerData]) => {
-      // Получаем свечи для расчета (используем 1-минутные свечи)
-      const candles = tickerData.candles?.filter(candle => candle.timeframe === '1m') || [];
+      // Получаем свечи для расчета (используем выбранный таймфрейм)
+      const candles = tickerData.candles?.filter(candle => candle.timeframe === settings.signalTimeframe) || [];
       
       if (candles.length >= settings.signalCandlesCount + 1) {
         // Сортируем свечи по времени (последние сначала)
