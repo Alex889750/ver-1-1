@@ -176,7 +176,7 @@ async def get_crypto_prices(
     interval_configs: Optional[str] = Query(default="15s,30s,24h", description="Comma-separated list of 3 intervals for table columns")
 ):
     """
-    Получить актуальные цены криптовалют с продвинутыми графиками
+    Получить актуальные цены криптовалют с продвинутыми графиками и настраиваемыми интервалами
     """
     try:
         # Парсим таймфреймы
@@ -184,11 +184,21 @@ async def get_crypto_prices(
         if not tf_list:
             tf_list = ['30s', '1m', '5m']  # По умолчанию
         
+        # Парсим настраиваемые интервалы для колонок таблицы
+        interval_list = [interval.strip() for interval in interval_configs.split(',') if interval.strip()]
+        if len(interval_list) != 3:
+            interval_list = ['15s', '30s', '24h']  # По умолчанию 3 колонки
+        
+        # Конвертируем интервалы в секунды
+        interval_seconds = [parse_interval_to_seconds(interval) for interval in interval_list]
+        
         # Получаем данные от MEXC API
         raw_data = await optimized_mexc_service.get_filtered_tickers(SUPPORTED_TICKERS)
         
-        # Получаем данные из продвинутого трекера цен
-        tracked_data = advanced_price_tracker.get_symbols_batch_data(list(raw_data.keys()), tf_list)
+        # Получаем данные из продвинутого трекера цен с настраиваемыми интервалами
+        tracked_data = advanced_price_tracker.get_symbols_batch_data(
+            list(raw_data.keys()), tf_list, interval_seconds
+        )
         
         # Форматируем данные
         formatted_data = []
@@ -202,7 +212,8 @@ async def get_crypto_prices(
                 "high24h": float(ticker_data.get("highPrice", 0)) if ticker_data.get("highPrice") else 0,
                 "low24h": float(ticker_data.get("lowPrice", 0)) if ticker_data.get("lowPrice") else 0,
                 "timestamp": datetime.utcnow().isoformat(),
-                "source": "mexc"
+                "source": "mexc",
+                "interval_configs": interval_list  # Возвращаем конфигурацию интервалов
             }
             
             # Дополняем данными из трекера
@@ -212,6 +223,11 @@ async def get_crypto_prices(
                     "change_15s": track_data.get("change_15s"),
                     "change_30s": track_data.get("change_30s"),
                 })
+                
+                # Добавляем настраиваемые интервалы
+                for i in range(3):
+                    if f'change_interval_{i}' in track_data:
+                        formatted_ticker[f'change_interval_{i}'] = track_data[f'change_interval_{i}']
                 
                 # Добавляем свечи для всех запрошенных таймфреймов
                 candles = []
@@ -239,6 +255,10 @@ async def get_crypto_prices(
             "change_15s": lambda x: x[1].change_15s.percent_change if x[1].change_15s else 0,
             "change_30s": lambda x: x[1].change_30s.percent_change if x[1].change_30s else 0,
         }
+        
+        # Добавляем поддержку сортировки по настраиваемым интервалам
+        for i in range(3):
+            sort_key_map[f'change_interval_{i}'] = lambda x, idx=i: getattr(x[1], f'change_interval_{idx}').percent_change if hasattr(x[1], f'change_interval_{idx}') and getattr(x[1], f'change_interval_{idx}') else 0
         
         if sort_by in sort_key_map:
             formatted_data.sort(
