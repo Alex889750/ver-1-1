@@ -246,7 +246,7 @@ const CompactCryptoScreener = () => {
         return updated;
       });
     }
-  }, [settings.signalThreshold, settings.signalCandlesCount]);
+  }, [settings.signalThreshold, settings.signalCandlesCount, settings.signalTimeframe]);
 
   const formatConfigurableChange = useCallback((data, intervalIndex) => {
     const changeKey = `change_interval_${intervalIndex}`;
