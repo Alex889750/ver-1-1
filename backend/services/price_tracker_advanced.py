@@ -256,8 +256,9 @@ class AdvancedPriceTracker:
             # Возвращаем последние N свечей
             return [candle.to_dict() for candle in candles[-limit:]]
     
-    def get_symbols_batch_data(self, symbols: List[str], timeframes: List[str] = ['15s', '30s', '1m']) -> Dict[str, Dict]:
-        """Получить данные для batch символов с множественными таймфреймами"""
+    def get_symbols_batch_data(self, symbols: List[str], timeframes: List[str] = ['15s', '30s', '1m'], 
+                             interval_configs: List[int] = [15, 30]) -> Dict[str, Dict]:
+        """Получить данные для batch символов с множественными таймфреймами и настраиваемыми интервалами"""
         result = {}
         
         with self.lock:
@@ -272,6 +273,10 @@ class AdvancedPriceTracker:
                             "change_30s": self.get_price_change(symbol, 30),
                             "last_updated": datetime.fromtimestamp(symbol_data.last_update).isoformat()
                         }
+                        
+                        # Добавляем настраиваемые интервалы
+                        interval_changes = self.get_multiple_price_changes(symbol, interval_configs)
+                        result[symbol].update(interval_changes)
                         
                         # Добавляем данные по таймфреймам
                         for tf in timeframes:
