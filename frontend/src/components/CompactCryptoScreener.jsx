@@ -674,6 +674,94 @@ const CompactCryptoScreener = () => {
           </CardContent>
         </Card>
 
+        {/* Signals Table */}
+        {settings.showSignalsTable && (
+          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm mt-6">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-white text-xl">
+                  🚨 Таблица сигналов • Порог: {settings.signalThreshold.toFixed(2)} • {signalsData.length} сигналов
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSignalsData([])}
+                  className="text-red-400 border-red-500 hover:bg-red-600/20"
+                >
+                  Очистить
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-700">
+                      <th className="py-2 px-3 text-left text-gray-300 font-medium text-xs">
+                        Время
+                      </th>
+                      <th className="py-2 px-3 text-left text-gray-300 font-medium text-xs">
+                        Тикер
+                      </th>
+                      <th className="py-2 px-3 text-right text-gray-300 font-medium text-xs">
+                        Превышение порога
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {signalsData.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} className="py-6 text-center text-gray-500">
+                          Сигналы не обнаружены
+                        </td>
+                      </tr>
+                    ) : (
+                      signalsData.map((signal) => (
+                        <tr key={signal.id} className="border-b border-gray-700/30 hover:bg-gray-700/10 transition-colors">
+                          <td className="py-2 px-3">
+                            <span className="text-gray-300 font-mono text-xs">
+                              {signal.time}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">
+                                  {formatCurrency(signal.ticker).substring(0, 1)}
+                                </span>
+                              </div>
+                              <span className="text-white font-semibold text-sm">
+                                {formatCurrency(signal.ticker)}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            <Badge 
+                              variant={signal.isPositive ? "default" : "destructive"}
+                              className={`font-mono text-xs px-2 py-1 ${
+                                signal.isPositive 
+                                  ? 'bg-green-600/80 text-green-100' 
+                                  : 'bg-red-600/80 text-red-100'
+                              }`}
+                            >
+                              {signal.isPositive ? '+' : '-'}{signal.value}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              {signalsData.length > 0 && (
+                <div className="mt-3 text-center text-xs text-gray-500">
+                  Показано последние {signalsData.length} сигналов (максимум 50)
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Status Indicator */}
         <div className="mt-6 text-center">
           <div className={`inline-flex items-center space-x-2 ${statusInfo.color} border rounded-full px-4 py-2`}>
