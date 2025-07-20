@@ -171,32 +171,35 @@ const CompactCryptoScreener = () => {
         const latestCandle = sortedCandles[0];
         const previousCandle = sortedCandles[1];
         
-        // Процентное изменение за последнюю минуту
-        const lastMinuteChange = ((latestCandle.close - previousCandle.close) / previousCandle.close) * 100;
+        // Изменение цены за последнюю минуту (абсолютное значение)
+        const lastMinutePriceChange = latestCandle.close - previousCandle.close;
         
         // Берем предыдущие N свечей для расчета среднего изменения
         const historicalCandles = sortedCandles.slice(1, settings.signalCandlesCount + 1);
         
-        if (historicalCandles.length === settings.signalCandlesCount && Math.abs(lastMinuteChange) > 0.001) {
-          // Рассчитываем среднее процентное изменение за предыдущие N минут
-          let totalPercentChange = 0;
+        if (historicalCandles.length === settings.signalCandlesCount && Math.abs(lastMinutePriceChange) > 0.0001) {
+          // Рассчитываем среднее изменение цены за предыдущие N минут
+          let totalPriceChange = 0;
+          let validChanges = 0;
+          
           for (let i = 0; i < historicalCandles.length - 1; i++) {
             const current = historicalCandles[i];
             const previous = historicalCandles[i + 1];
-            const percentChange = ((current.close - previous.close) / previous.close) * 100;
-            totalPercentChange += percentChange;
+            const priceChange = current.close - previous.close;
+            totalPriceChange += priceChange;
+            validChanges++;
           }
           
-          const averagePercentChange = totalPercentChange / (historicalCandles.length - 1);
+          const averagePriceChange = validChanges > 0 ? totalPriceChange / validChanges : 0;
           
           // Избегаем деления на ноль и очень маленькие значения
-          if (Math.abs(averagePercentChange) > 0.01) {
-            // Рассчитываем отношение процентных изменений
-            const ratio = Math.abs(lastMinuteChange) / Math.abs(averagePercentChange);
+          if (Math.abs(averagePriceChange) > 0.0001) {
+            // Рассчитываем отношение изменений цен
+            const ratio = Math.abs(lastMinutePriceChange) / Math.abs(averagePriceChange);
             
             // Проверяем превышение порога
             if (ratio >= settings.signalThreshold) {
-              const isPositive = lastMinuteChange > 0;
+              const isPositive = lastMinutePriceChange > 0;
               
               newSignals.push({
                 id: `${ticker}-${Date.now()}`,
@@ -204,8 +207,8 @@ const CompactCryptoScreener = () => {
                 ticker: ticker,
                 value: ratio.toFixed(2),
                 isPositive: isPositive,
-                lastMinuteChange: lastMinuteChange.toFixed(3),
-                averageChange: averagePercentChange.toFixed(3),
+                lastMinuteChange: lastMinutePriceChange.toFixed(6),
+                averageChange: averagePriceChange.toFixed(6),
                 ratio: ratio
               });
             }
