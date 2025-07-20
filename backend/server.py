@@ -311,6 +311,76 @@ async def get_crypto_prices(
             detail=f"Failed to fetch crypto prices: {str(e)}"
         )
 
+@api_router.post("/crypto/load-history")
+async def load_historical_data():
+    """
+    Загрузить исторические данные для всех поддерживаемых символов
+    """
+    try:
+        logger.info("Starting historical data loading...")
+        
+        # Загружаем исторические данные
+        historical_data = await historical_data_service.load_historical_data_for_symbols(
+            symbols=SUPPORTED_TICKERS[:50],  # Ограничиваем для тестирования
+            timeframes=['1m', '5m', '15m', '1h', '4h', '1d']
+        )
+        
+        # Заполняем трекер историческими данными
+        price_tracker_with_history.populate_historical_data(historical_data)
+        
+        # Переключаемся на трекер с историей
+        global advanced_price_tracker
+        advanced_price_tracker = price_tracker_with_history
+        
+        loaded_symbols = len(historical_data)
+        total_candles = sum(
+            len(tf_data) for symbol_data in historical_data.values() 
+            for tf_data in symbol_data.values()
+        )
+        
+        logger.info(f"Historical data loading completed: {loaded_symbols} symbols, {total_candles} candles")
+        
+        return {
+            "success": True,
+            "message": f"Загружены исторические данные для {loaded_symbols} символов",
+            "symbols_loaded": loaded_symbols,
+            "total_candles": total_candles,
+            "timeframes": ['1m', '5m', '15m', '1h', '4h', '1d'],
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error loading historical data: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to load historical data: {str(e)}"
+        )
+
+@api_router.get("/crypto/history-status")
+async def get_history_status():
+    """
+    Получить статус загрузки исторических данных
+    """
+    try:
+        is_loaded = advanced_price_tracker.is_historical_data_loaded() if hasattr(advanced_price_tracker, 'is_historical_data_loaded') else False
+        active_symbols = advanced_price_tracker.get_active_symbols_count()
+        
+        return {
+            "historical_data_loaded": is_loaded,
+            "active_symbols": active_symbols,
+            "supported_symbols": len(SUPPORTED_TICKERS),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error getting history status: {str(e)}")
+        return {
+            "historical_data_loaded": False,
+            "active_symbols": 0,
+            "supported_symbols": len(SUPPORTED_TICKERS),
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.dict()
