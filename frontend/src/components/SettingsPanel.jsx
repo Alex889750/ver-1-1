@@ -57,6 +57,15 @@ const SettingsPanel = ({
     });
   };
 
+  const handleTableIntervalChange = (columnIndex, newInterval) => {
+    const newIntervals = [...settings.tableIntervals];
+    newIntervals[columnIndex] = newInterval;
+    onSettingsChange({
+      ...settings,
+      tableIntervals: newIntervals
+    });
+  };
+
   if (!isOpen) {
     return (
       <div className="fixed top-4 right-4 z-50">
