@@ -431,17 +431,17 @@ const CompactCryptoScreener = () => {
                               </span>
                             </td>
                             
-                            <td className="py-2 px-2 text-right">
-                              <span className={`font-mono text-xs ${change15s.color}`}>
-                                {change15s.text}
-                              </span>
-                            </td>
-                            
-                            <td className="py-2 px-2 text-right">
-                              <span className={`font-mono text-xs ${change30s.color}`}>
-                                {change30s.text}
-                              </span>
-                            </td>
+                            {/* Dynamic interval columns */}
+                            {settings.tableIntervals.map((interval, index) => {
+                              const changeData = formatConfigurableChange(data, index);
+                              return (
+                                <td key={`interval-${index}`} className="py-2 px-2 text-right">
+                                  <span className={`font-mono text-xs ${changeData.color}`}>
+                                    {changeData.text}
+                                  </span>
+                                </td>
+                              );
+                            })}
                             
                             <td className="py-2 px-2 text-right">
                               <Badge 
