@@ -606,7 +606,7 @@ const CompactCryptoScreener = () => {
                               );
                             })}
                             
-                            <td className="py-2 px-2 text-right">
+                            <td className="py-2 px-2 text-center">
                               <span className={`font-mono text-sm ${
                                 data.changePercent24h >= 0 
                                   ? 'text-green-400' 
