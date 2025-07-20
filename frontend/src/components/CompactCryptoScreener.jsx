@@ -751,16 +751,21 @@ const CompactCryptoScreener = () => {
                             </div>
                           </td>
                           <td className="py-2 px-3 text-right">
-                            <Badge 
-                              variant={signal.isPositive ? "default" : "destructive"}
-                              className={`font-mono text-xs px-2 py-1 ${
-                                signal.isPositive 
-                                  ? 'bg-green-600/80 text-green-100' 
-                                  : 'bg-red-600/80 text-red-100'
-                              }`}
-                            >
-                              {signal.isPositive ? '+' : '-'}{signal.value}
-                            </Badge>
+                            <div className="flex flex-col items-end space-y-1">
+                              <Badge 
+                                variant={signal.isPositive ? "default" : "destructive"}
+                                className={`font-mono text-xs px-2 py-1 ${
+                                  signal.isPositive 
+                                    ? 'bg-green-600/80 text-green-100' 
+                                    : 'bg-red-600/80 text-red-100'
+                                }`}
+                              >
+                                {signal.value}
+                              </Badge>
+                              <div className="text-xs text-gray-500 font-mono">
+                                {signal.lastMinuteChange}% / {signal.averageChange}%
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       ))
