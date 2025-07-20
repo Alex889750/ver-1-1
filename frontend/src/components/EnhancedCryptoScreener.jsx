@@ -48,13 +48,51 @@ const EnhancedCryptoScreener = () => {
     { value: '1d', label: '1 день', color: '#84cc16' },
   ];
 
-  // Компактные колонки (без цветного фона для 24ч %)
+  // Доступные интервалы для таблицы
+  const availableTableIntervals = [
+    { value: '2s', label: '2 сек', seconds: 2 },
+    { value: '5s', label: '5 сек', seconds: 5 },
+    { value: '10s', label: '10 сек', seconds: 10 },
+    { value: '15s', label: '15 сек', seconds: 15 },
+    { value: '30s', label: '30 сек', seconds: 30 },
+    { value: '1m', label: '1 мин', seconds: 60 },
+    { value: '2m', label: '2 мин', seconds: 120 },
+    { value: '3m', label: '3 мин', seconds: 180 },
+    { value: '5m', label: '5 мин', seconds: 300 },
+    { value: '10m', label: '10 мин', seconds: 600 },
+    { value: '15m', label: '15 мин', seconds: 900 },
+    { value: '20m', label: '20 мин', seconds: 1200 },
+    { value: '30m', label: '30 мин', seconds: 1800 },
+    { value: '1h', label: '60 мин', seconds: 3600 },
+    { value: '4h', label: '240 мин', seconds: 14400 },
+    { value: '24h', label: '1 день', seconds: 86400 }
+  ];
+
+  // Компактные колонки (с настраиваемыми интервалами)
   const columns = [
     { key: 'symbol', label: 'Символ', sortable: true, width: '200px' },
     { key: 'price', label: 'Цена (USDT)', sortable: true, align: 'right', width: '120px' },
-    { key: 'change_15s', label: '15с', sortable: true, align: 'right', width: '80px' },
-    { key: 'change_30s', label: '30с', sortable: true, align: 'right', width: '80px' },
-    { key: 'changePercent24h', label: '24ч %', sortable: true, align: 'right', width: '90px' },
+    { 
+      key: 'change_interval_0', 
+      label: availableTableIntervals.find(i => i.value === settings.tableIntervals[0])?.label || '15с', 
+      sortable: true, 
+      align: 'right', 
+      width: '80px' 
+    },
+    { 
+      key: 'change_interval_1', 
+      label: availableTableIntervals.find(i => i.value === settings.tableIntervals[1])?.label || '30с', 
+      sortable: true, 
+      align: 'right', 
+      width: '80px' 
+    },
+    { 
+      key: 'change_interval_2', 
+      label: availableTableIntervals.find(i => i.value === settings.tableIntervals[2])?.label || '24ч %', 
+      sortable: true, 
+      align: 'right', 
+      width: '90px' 
+    },
     { key: 'volume', label: 'Объем', sortable: true, align: 'right', width: '100px' },
     { key: 'actions', label: 'Действия', sortable: false, align: 'center', width: '100px' },
   ];
