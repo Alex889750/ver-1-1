@@ -222,6 +222,13 @@ class AdvancedPriceTracker:
                 "current_price": current_price
             }
     
+    def get_multiple_price_changes(self, symbol: str, intervals_seconds: List[int]) -> Dict[str, Optional[Dict]]:
+        """Получить изменения цены для нескольких интервалов"""
+        result = {}
+        for i, seconds in enumerate(intervals_seconds):
+            result[f'change_interval_{i}'] = self.get_price_change(symbol, seconds)
+        return result
+    
     def get_candles(self, symbol: str, timeframe: str = '30s', limit: int = 50) -> List[Dict]:
         """Получить свечные данные для символа и таймфрейма"""
         with self.lock:
