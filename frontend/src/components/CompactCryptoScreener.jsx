@@ -553,37 +553,6 @@ const CompactCryptoScreener = () => {
                             </span>
                           )}
                         </div>
-                        {/* Сортировка мин/макс под заголовком */}
-                        {column.sortable && column.key !== 'symbol' && (
-                          <div className="flex gap-1 mt-1 justify-center">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSettings(prev => ({
-                                  ...prev,
-                                  sortBy: column.key,
-                                  sortOrder: 'desc'
-                                }));
-                              }}
-                              className="text-xs px-1 py-0.5 rounded bg-red-600/20 text-red-400 hover:bg-red-600/30"
-                            >
-                              Max
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSettings(prev => ({
-                                  ...prev,
-                                  sortBy: column.key,
-                                  sortOrder: 'asc'
-                                }));
-                              }}
-                              className="text-xs px-1 py-0.5 rounded bg-green-600/20 text-green-400 hover:bg-green-600/30"
-                            >
-                              Min
-                            </button>
-                          </div>
-                        )}
                       </th>
                     ))}
                   </tr>
