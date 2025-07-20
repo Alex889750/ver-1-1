@@ -801,4 +801,4 @@ const CompactCryptoScreenerMax = () => {
   );
 };
 
-export default CompactCryptoScreener;
+export default CompactCryptoScreenerMax;
