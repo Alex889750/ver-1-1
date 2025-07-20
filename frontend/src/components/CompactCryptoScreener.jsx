@@ -151,6 +151,63 @@ const CompactCryptoScreener = () => {
     };
   }, [getPriceChangeColor]);
 
+  const calculateSignals = useCallback((data) => {
+    const newSignals = [];
+    const currentTime = new Date().toLocaleTimeString('ru-RU', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    });
+    
+    Object.entries(data).forEach(([ticker, tickerData]) => {
+      // Получаем свечи для расчета (используем 1-минутные свечи)
+      const candles = tickerData.candles?.filter(candle => candle.timeframe === '1m') || [];
+      
+      if (candles.length >= settings.signalCandlesCount) {
+        // Сортируем свечи по времени (последние сначала)
+        const sortedCandles = candles.sort((a, b) => b.timestamp - a.timestamp);
+        
+        // Берем последнюю закрытую свечу
+        const latestCandle = sortedCandles[0];
+        const currentClose = latestCandle.close;
+        
+        // Берем предыдущие N свечей для расчета среднего
+        const previousCandles = sortedCandles.slice(1, settings.signalCandlesCount + 1);
+        
+        if (previousCandles.length === settings.signalCandlesCount) {
+          // Рассчитываем среднее значение
+          const averageClose = previousCandles.reduce((sum, candle) => sum + candle.close, 0) / previousCandles.length;
+          
+          // Рассчитываем отношение
+          const ratio = currentClose / averageClose;
+          
+          // Проверяем превышение порога
+          if (ratio >= settings.signalThreshold || ratio <= (2 - settings.signalThreshold)) {
+            const isPositive = ratio >= settings.signalThreshold;
+            const signalValue = isPositive ? ratio : (2 - ratio); // Нормализуем для отрицательных сигналов
+            
+            newSignals.push({
+              id: `${ticker}-${Date.now()}`,
+              time: currentTime,
+              ticker: ticker,
+              value: signalValue.toFixed(4),
+              isPositive: isPositive,
+              ratio: ratio
+            });
+          }
+        }
+      }
+    });
+    
+    if (newSignals.length > 0) {
+      setSignalsData(prev => {
+        // Добавляем новые сигналы и ограничиваем до 50 последних
+        const updated = [...newSignals, ...prev].slice(0, 50);
+        return updated;
+      });
+    }
+  }, [settings.signalThreshold, settings.signalCandlesCount]);
+
   const formatConfigurableChange = useCallback((data, intervalIndex) => {
     const changeKey = `change_interval_${intervalIndex}`;
     const changeData = data[changeKey];
