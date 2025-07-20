@@ -162,7 +162,8 @@ async def get_crypto_prices(
     sort_by: Optional[str] = Query(default="symbol", description="Sort by: symbol, price, changePercent24h, volume, change_15s, change_30s"),
     sort_order: Optional[str] = Query(default="asc", description="Sort order: asc, desc"),
     search: Optional[str] = Query(default=None, description="Search filter for symbol names"),
-    timeframes: Optional[str] = Query(default="15s,30s,1m", description="Comma-separated list of timeframes")
+    timeframes: Optional[str] = Query(default="15s,30s,1m", description="Comma-separated list of timeframes"),
+    intervals: Optional[str] = Query(default="15s,30s,24h", description="Comma-separated list of price change intervals")
 ):
     """
     Получить актуальные цены криптовалют с продвинутыми графиками
