@@ -43,7 +43,7 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
   if (!chartData) {
     return (
       <div 
-        className="flex items-center justify-center bg-gray-900/80 rounded border border-gray-600"
+        className="flex items-center justify-center bg-black rounded border border-gray-600"
         style={{ width, height }}
       >
         <span className="text-gray-500 text-xs">Нет данных</span>
