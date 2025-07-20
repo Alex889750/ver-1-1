@@ -375,10 +375,40 @@ const EnhancedCryptoScreener = () => {
             <Badge variant="outline" className="px-3 py-1 text-xs border-blue-500 text-blue-400">
               16 интервалов
             </Badge>
+            {historyLoaded && (
+              <Badge variant="outline" className="px-3 py-1 text-xs border-green-500 text-green-400">
+                📊 История загружена
+              </Badge>
+            )}
             <span className="text-gray-400 text-sm">
               {lastUpdate.toLocaleTimeString()}
             </span>
           </div>
+          
+          {/* Кнопка загрузки истории */}
+          {!historyLoaded && (
+            <div className="mt-4">
+              <Button
+                onClick={loadHistoricalData}
+                disabled={historyLoading}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg font-semibold shadow-lg"
+              >
+                {historyLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Загружаем историю...
+                  </>
+                ) : (
+                  <>
+                    📊 Загрузить историю графиков
+                  </>
+                )}
+              </Button>
+              <p className="text-gray-400 text-sm mt-2">
+                Загрузит последние 50 свечей для всех таймфреймов
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Error Message */}
