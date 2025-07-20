@@ -104,6 +104,7 @@ const CompactCryptoScreener = () => {
         limit: settings.displayCount.toString(),
         sort_by: settings.sortBy,
         sort_order: settings.sortOrder,
+        timeframes: settings.chartTimeframes.join(','), // Передаем выбранные таймфреймы
       });
       
       if (settings.search) {
