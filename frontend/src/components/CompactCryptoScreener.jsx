@@ -575,17 +575,9 @@ const CompactCryptoScreener = () => {
                           {/* Компактная строка данных */}
                           <tr className="border-b border-gray-700/30 hover:bg-gray-700/10 transition-colors">
                             <td className="py-2 px-2">
-                              <div className="flex items-center space-x-2">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                                  <span className="text-white text-xs font-bold">
-                                    {formatCurrency(ticker).substring(0, 1)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <div className="text-white font-semibold text-sm">{formatCurrency(ticker)}</div>
-                                  <div className="text-gray-500 text-xs">{ticker}</div>
-                                </div>
-                              </div>
+                              <span className="text-white font-mono text-sm">
+                                {formatCurrency(ticker)}
+                              </span>
                             </td>
                             
                             <td className="py-2 px-2 text-right">
