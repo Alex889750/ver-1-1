@@ -169,10 +169,14 @@ async def get_crypto_prices(
     Получить актуальные цены криптовалют с продвинутыми графиками
     """
     try:
-        # Парсим таймфреймы
+        # Парсим таймфреймы и интервалы
         tf_list = [tf.strip() for tf in timeframes.split(',') if tf.strip()]
         if not tf_list:
             tf_list = ['30s', '1m', '5m']  # По умолчанию
+        
+        interval_list = [int.strip() for int in intervals.split(',') if int.strip()]
+        if not interval_list:
+            interval_list = ['15s', '30s', '24h']  # По умолчанию
         
         # Получаем данные от MEXC API
         raw_data = await optimized_mexc_service.get_filtered_tickers(SUPPORTED_TICKERS)
