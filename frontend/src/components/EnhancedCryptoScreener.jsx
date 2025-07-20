@@ -543,9 +543,23 @@ const EnhancedCryptoScreener = () => {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
+                                
+                                // Определяем реальный ключ для сортировки
+                                let realSortKey = column.key;
+                                if (column.key === 'change_interval_0') {
+                                  const interval = settings.tableIntervals[0];
+                                  realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+                                } else if (column.key === 'change_interval_1') {
+                                  const interval = settings.tableIntervals[1];
+                                  realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+                                } else if (column.key === 'change_interval_2') {
+                                  const interval = settings.tableIntervals[2];
+                                  realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+                                }
+                                
                                 setSettings(prev => ({
                                   ...prev,
-                                  sortBy: column.key,
+                                  sortBy: realSortKey,
                                   sortOrder: 'desc'
                                 }));
                               }}
@@ -556,9 +570,23 @@ const EnhancedCryptoScreener = () => {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
+                                
+                                // Определяем реальный ключ для сортировки
+                                let realSortKey = column.key;
+                                if (column.key === 'change_interval_0') {
+                                  const interval = settings.tableIntervals[0];
+                                  realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+                                } else if (column.key === 'change_interval_1') {
+                                  const interval = settings.tableIntervals[1];
+                                  realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+                                } else if (column.key === 'change_interval_2') {
+                                  const interval = settings.tableIntervals[2];
+                                  realSortKey = interval === '24h' ? 'changePercent24h' : `change_${convert_interval_to_seconds_frontend(interval)}s`;
+                                }
+                                
                                 setSettings(prev => ({
                                   ...prev,
-                                  sortBy: column.key,
+                                  sortBy: realSortKey,
                                   sortOrder: 'asc'
                                 }));
                               }}
