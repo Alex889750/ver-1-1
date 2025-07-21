@@ -321,9 +321,14 @@ const CompactCryptoScreenerMax = () => {
   }, [fetchPrices]);
 
   useEffect(() => {
-    const interval = setInterval(fetchPrices, 3000); // 3 секунды для менее частого обновления
+    fetchPrices();
+    fetchBtcData(); // Добавляем загрузку данных BTCUSDT
+    const interval = setInterval(() => {
+      fetchPrices();
+      fetchBtcData(); // Обновляем данные BTCUSDT каждые 3 секунды
+    }, 3000);
     return () => clearInterval(interval);
-  }, [fetchPrices]);
+  }, [fetchPrices, fetchBtcData]);
 
   const handleSort = (columnKey) => {
     if (columns.find(col => col.key === columnKey)?.sortable) {
