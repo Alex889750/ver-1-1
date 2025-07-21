@@ -63,8 +63,9 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
 
   // Функция для конвертации цены в Y координату
   const priceToY = (price) => {
-    if (adjustedRange === 0) return chartHeight / 2 + chartPadding;
-    return chartPadding + (adjustedMax - price) / adjustedRange * chartHeight;
+    if (!price || isNaN(price) || adjustedRange === 0) return chartHeight / 2 + chartPadding;
+    const y = chartPadding + (adjustedMax - price) / adjustedRange * chartHeight;
+    return isNaN(y) ? chartHeight / 2 + chartPadding : y;
   };
 
   // Рассчитываем статистику
