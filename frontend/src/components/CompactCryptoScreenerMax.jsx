@@ -258,6 +258,25 @@ const CompactCryptoScreenerMax = () => {
     return formatShortTermChange(changeData);
   }, [formatShortTermChange]);
 
+  const fetchBtcData = useCallback(async () => {
+    try {
+      // Получаем данные BTCUSDT с нужными таймфреймами
+      const params = new URLSearchParams({
+        limit: '1', // Только BTCUSDT
+        search: 'BTCUSDT',
+        timeframes: btcTimeframes.join(',')
+      });
+
+      const response = await axios.get(`${API}/crypto/prices?${params}`);
+      
+      if (response.data && response.data.data && response.data.data.BTCUSDT) {
+        setBtcData(response.data.data.BTCUSDT);
+      }
+    } catch (err) {
+      console.error('Error fetching BTCUSDT data:', err);
+    }
+  }, [btcTimeframes]);
+
   const fetchPrices = useCallback(async () => {
     try {
       setError(null);
