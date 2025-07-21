@@ -92,6 +92,31 @@ const SettingsPanel = ({
     });
   };
 
+  const handleBtcTimeframeToggle = (timeframe) => {
+    const currentTimeframes = btcTimeframes || ['1m', '1h', '1d'];
+    let newTimeframes;
+    
+    if (currentTimeframes.includes(timeframe)) {
+      // Убираем таймфрейм, но не менее 1
+      newTimeframes = currentTimeframes.filter(tf => tf !== timeframe);
+      if (newTimeframes.length === 0) {
+        newTimeframes = [timeframe]; // Оставляем хотя бы один
+      }
+    } else {
+      // Добавляем таймфрейм, но не более 3
+      if (currentTimeframes.length < 3) {
+        newTimeframes = [...currentTimeframes, timeframe];
+      } else {
+        // Заменяем последний
+        newTimeframes = [...currentTimeframes.slice(0, 2), timeframe];
+      }
+    }
+    
+    if (onBtcTimeframesChange) {
+      onBtcTimeframesChange(newTimeframes);
+    }
+  };
+
   if (!isOpen) {
     return (
       <div className="fixed top-4 right-4 z-50">
