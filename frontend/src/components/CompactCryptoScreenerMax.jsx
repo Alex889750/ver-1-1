@@ -488,49 +488,122 @@ const CompactCryptoScreenerMax = () => {
           </div>
         )}
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
-          <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
-            <div className="text-gray-400 text-xs">Показано</div>
-            <div className="text-white text-sm font-bold">{activeTickers}</div>
-          </div>
-          <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
-            <div className="text-gray-400 text-xs">Доступно</div>
-            <div className="text-blue-400 text-sm font-bold">{totalTickers}</div>
-          </div>
-          <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
-            <div className="text-gray-400 text-xs">Сортировка</div>
-            <div className="text-green-400 text-sm">{settings.sortBy} {getSortIcon(settings.sortBy)}</div>
-          </div>
-          <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
-            <div className="text-gray-400 text-xs">Графики</div>
-            <div className="text-purple-400 text-sm">{settings.chartTimeframes.length} TF</div>
-          </div>
-          <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
-            <div className="text-gray-400 text-xs">Поиск</div>
-            <div className="text-yellow-400 text-sm">{settings.search || 'Все'}</div>
-          </div>
-          <div className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
-            <div className="text-gray-400 text-xs">История</div>
-            {historyLoading ? (
-              <div className="text-orange-400 text-sm">
-                {historyStatus.total > 0 ? 
-                  `${historyStatus.progress}/${historyStatus.total}` : 
-                  'Загрузка...'
-                }
+        {/* BTCUSDT Charts and Info Panel Section */}
+        <div className="flex gap-6 mb-6">
+          {/* Left: BTCUSDT Charts (2/3 width) */}
+          <div className="w-2/3">
+            <div className="bg-gray-800/50 rounded-lg border border-gray-700 p-4">
+              <h3 className="text-white text-lg font-semibold mb-4">
+                📈 BTCUSDT • Мульти-таймфрейм анализ
+              </h3>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* 1min Chart */}
+                <div className="bg-black rounded-lg border border-gray-600 overflow-hidden">
+                  <div className="bg-gray-800/70 px-3 py-2 text-xs text-gray-300 font-medium border-b border-gray-700">
+                    📊 1 мин
+                  </div>
+                  <TradingViewChart
+                    candles={[]} // Пока пустые данные, потом подключим реальные
+                    symbol="BTCUSDT"
+                    timeframe="1m"
+                    width="100%"
+                    height={200}
+                  />
+                </div>
+                
+                {/* 1h Chart */}
+                <div className="bg-black rounded-lg border border-gray-600 overflow-hidden">
+                  <div className="bg-gray-800/70 px-3 py-2 text-xs text-gray-300 font-medium border-b border-gray-700">
+                    📊 1 час
+                  </div>
+                  <TradingViewChart
+                    candles={[]} // Пока пустые данные, потом подключим реальные
+                    symbol="BTCUSDT"
+                    timeframe="1h"
+                    width="100%"
+                    height={200}
+                  />
+                </div>
+                
+                {/* 1d Chart */}
+                <div className="bg-black rounded-lg border border-gray-600 overflow-hidden">
+                  <div className="bg-gray-800/70 px-3 py-2 text-xs text-gray-300 font-medium border-b border-gray-700">
+                    📊 1 день
+                  </div>
+                  <TradingViewChart
+                    candles={[]} // Пока пустые данные, потом подключим реальные
+                    symbol="BTCUSDT"
+                    timeframe="1d"
+                    width="100%"
+                    height={200}
+                  />
+                </div>
               </div>
-            ) : historyLoaded ? (
-              <div className="text-green-400 text-sm">✓ Готово</div>
-            ) : (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={loadHistory}
-                className="text-xs px-2 py-0.5 h-auto border-blue-500 text-blue-400 hover:bg-blue-600/20"
-              >
-                Загрузить
-              </Button>
-            )}
+            </div>
+          </div>
+          
+          {/* Right: Compact Info Panel (1/3 width) */}
+          <div className="w-1/3">
+            <div className="bg-gray-800/50 rounded-lg border border-gray-700 p-4 h-full">
+              <h3 className="text-white text-lg font-semibold mb-3">
+                📊 Информация
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-gray-700/50 rounded-md p-2 text-center">
+                  <div className="text-gray-400 text-xs">Показано</div>
+                  <div className="text-white text-sm font-bold">{activeTickers}</div>
+                </div>
+                <div className="bg-gray-700/50 rounded-md p-2 text-center">
+                  <div className="text-gray-400 text-xs">Доступно</div>
+                  <div className="text-blue-400 text-sm font-bold">{totalTickers}</div>
+                </div>
+                <div className="bg-gray-700/50 rounded-md p-2 text-center">
+                  <div className="text-gray-400 text-xs">Сортировка</div>
+                  <div className="text-green-400 text-xs">{settings.sortBy} {getSortIcon(settings.sortBy)}</div>
+                </div>
+                <div className="bg-gray-700/50 rounded-md p-2 text-center">
+                  <div className="text-gray-400 text-xs">Графики</div>
+                  <div className="text-purple-400 text-sm">{settings.chartTimeframes.length} TF</div>
+                </div>
+                <div className="bg-gray-700/50 rounded-md p-2 text-center">
+                  <div className="text-gray-400 text-xs">Поиск</div>
+                  <div className="text-yellow-400 text-xs">{settings.search || 'Все'}</div>
+                </div>
+                <div className="bg-gray-700/50 rounded-md p-2 text-center">
+                  <div className="text-gray-400 text-xs">История</div>
+                  {historyLoading ? (
+                    <div className="text-orange-400 text-xs">
+                      {historyStatus.total > 0 ? 
+                        `${historyStatus.progress}/${historyStatus.total}` : 
+                        'Загрузка...'
+                      }
+                    </div>
+                  ) : historyLoaded ? (
+                    <div className="text-green-400 text-xs">✓ Готово</div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={loadHistory}
+                      className="text-xs px-2 py-0.5 h-auto border-blue-500 text-blue-400 hover:bg-blue-600/20"
+                    >
+                      Загрузить
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {/* Connection Status */}
+              <div className="mt-3 text-center">
+                <div className={`inline-flex items-center space-x-2 px-2 py-1 rounded-full text-xs ${statusInfo.bgColor}`}>
+                  <span className={`w-2 h-2 rounded-full ${statusInfo.dotColor}`}></span>
+                  <span className={statusInfo.textColor}>{statusInfo.text}</span>
+                </div>
+                <div className="text-gray-500 text-xs mt-1">
+                  {lastUpdate.toLocaleTimeString()}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
