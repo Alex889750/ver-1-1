@@ -46,6 +46,10 @@ const CompactCryptoScreenerMax = () => {
   // Состояние для таблицы сигналов
   const [signalsData, setSignalsData] = useState([]);
 
+  // Состояние для графиков BTCUSDT
+  const [btcData, setBtcData] = useState({});
+  const [btcTimeframes, setBtcTimeframes] = useState(['1m', '1h', '1d']); // Настраиваемые таймфреймы для BTCUSDT
+
   // Доступные интервалы для таблицы
   const availableTableIntervals = [
     { value: '2s', label: '2 сек', seconds: 2 },
