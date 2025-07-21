@@ -628,13 +628,33 @@ const CompactCryptoScreenerMax = () => {
                             })}
                             
                             <td className="py-2 px-2 text-center">
-                              <span className={`font-mono text-sm ${
-                                data.changePercent24h >= 0 
-                                  ? 'text-green-400' 
-                                  : 'text-red-400'
-                              }`}>
-                                {data.changePercent24h > 0 ? '+' : ''}{data.changePercent24h.toFixed(2)}%
-                              </span>
+                              {(() => {
+                                // Ищем интервальную колонку "24h" или "1d" (1 день)
+                                const dayIntervalIndex = settings.tableIntervals.findIndex(interval => 
+                                  interval === '24h' || interval === '1d'
+                                );
+                                
+                                if (dayIntervalIndex >= 0) {
+                                  // Используем данные из соответствующей интервальной колонки
+                                  const changeData = formatConfigurableChange(data, dayIntervalIndex);
+                                  return (
+                                    <span className={`font-mono text-sm ${changeData.color}`}>
+                                      {changeData.text}
+                                    </span>
+                                  );
+                                } else {
+                                  // Если нет колонки "1 день", показываем 24ч данные как fallback
+                                  return (
+                                    <span className={`font-mono text-sm ${
+                                      data.changePercent24h >= 0 
+                                        ? 'text-green-400' 
+                                        : 'text-red-400'
+                                    }`}>
+                                      {data.changePercent24h > 0 ? '+' : ''}{data.changePercent24h.toFixed(2)}%
+                                    </span>
+                                  );
+                                }
+                              })()}
                             </td>
                             
                             <td className="py-2 px-2 text-right">
