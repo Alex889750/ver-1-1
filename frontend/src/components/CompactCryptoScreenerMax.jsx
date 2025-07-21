@@ -260,6 +260,9 @@ const CompactCryptoScreenerMax = () => {
 
   const fetchBtcData = useCallback(async () => {
     try {
+      console.log('=== Fetching BTCUSDT data ===');
+      console.log('btcTimeframes:', btcTimeframes);
+      
       // Получаем данные BTCUSDT с нужными таймфреймами
       const params = new URLSearchParams({
         limit: '1', // Только BTCUSDT
@@ -267,10 +270,19 @@ const CompactCryptoScreenerMax = () => {
         timeframes: btcTimeframes.join(',')
       });
 
+      console.log('API params:', params.toString());
+
       const response = await axios.get(`${API}/crypto/prices?${params}`);
       
+      console.log('API response:', response.data);
+      
       if (response.data && response.data.data && response.data.data.BTCUSDT) {
+        console.log('BTCUSDT data found:', response.data.data.BTCUSDT);
+        console.log('BTCUSDT candles:', response.data.data.BTCUSDT.candles);
         setBtcData(response.data.data.BTCUSDT);
+      } else {
+        console.warn('BTCUSDT data not found in response');
+        console.log('Available tickers in response:', Object.keys(response.data?.data || {}));
       }
     } catch (err) {
       console.error('Error fetching BTCUSDT data:', err);
