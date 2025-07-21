@@ -380,6 +380,31 @@ const SettingsPanel = ({
             </div>
           </div>
 
+          {/* Настройки таймфреймов BTCUSDT графиков */}
+          <div className="space-y-2">
+            <Label className="text-gray-300 text-sm font-medium">
+              ₿ BTCUSDT Таймфреймы (выберите до 3)
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              {availableTimeframes.map((timeframe) => (
+                <div key={timeframe.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`btc-${timeframe.value}`}
+                    checked={btcTimeframes?.includes(timeframe.value) || false}
+                    onCheckedChange={() => handleBtcTimeframeToggle(timeframe.value)}
+                    className="border-gray-600"
+                  />
+                  <Label htmlFor={`btc-${timeframe.value}`} className="text-gray-300 text-xs cursor-pointer">
+                    {timeframe.label}
+                  </Label>
+                </div>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500">
+              Выбрано: {btcTimeframes?.length || 0}/3 таймфрейма для BTCUSDT
+            </div>
+          </div>
+
           {/* Быстрые фильтры */}
           <div className="space-y-2">
             <Label className="text-gray-300 text-sm font-medium">
