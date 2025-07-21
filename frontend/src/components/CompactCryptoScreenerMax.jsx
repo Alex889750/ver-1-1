@@ -110,7 +110,7 @@ const CompactCryptoScreenerMax = () => {
     });
     
     const endColumns = [
-      { key: 'changePercent24h', label: '24ч %', sortable: true, align: 'center', width: '90px' },
+      { key: 'day_change', label: '1 день', sortable: true, align: 'center', width: '90px' },
       { key: 'volume', label: 'Объем', sortable: true, align: 'right', width: '100px' },
       { key: 'actions', label: 'Действия', sortable: false, align: 'center', width: '100px' },
     ];
