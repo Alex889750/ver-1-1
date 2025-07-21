@@ -15,7 +15,9 @@ const SettingsPanel = ({
   activeTickers = 0,
   availableTimeframes = [],
   availableTableIntervals = [],  // Add this new prop
-  availableSignalTimeframes = []  // Add this new prop for signal timeframes
+  availableSignalTimeframes = [],  // Add this new prop for signal timeframes
+  btcTimeframes = ['1m', '1h', '1d'],
+  onBtcTimeframesChange
 }) => {
   const handleDisplayCountChange = (e) => {
     const value = Math.max(1, Math.min(30, parseInt(e.target.value) || 10));
