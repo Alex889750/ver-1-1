@@ -504,6 +504,8 @@ const CompactCryptoScreenerMax = () => {
         availableTimeframes={availableTimeframes}
         availableTableIntervals={availableTableIntervals}
         availableSignalTimeframes={availableSignalTimeframes}
+        btcTimeframes={btcTimeframes}
+        onBtcTimeframesChange={setBtcTimeframes}
       />
 
       <div className="max-w-full mx-auto">
