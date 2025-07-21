@@ -525,47 +525,36 @@ const CompactCryptoScreenerMax = () => {
                 📈 BTCUSDT • Мульти-таймфрейм анализ
               </h3>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* 1min Chart */}
-                <div className="bg-black rounded-lg border border-gray-600 overflow-hidden">
-                  <div className="bg-gray-800/70 px-3 py-2 text-xs text-gray-300 font-medium border-b border-gray-700">
-                    📊 1 мин
-                  </div>
-                  <TradingViewChart
-                    candles={[]} // Пока пустые данные, потом подключим реальные
-                    symbol="BTCUSDT"
-                    timeframe="1m"
-                    width="100%"
-                    height={200}
-                  />
-                </div>
-                
-                {/* 1h Chart */}
-                <div className="bg-black rounded-lg border border-gray-600 overflow-hidden">
-                  <div className="bg-gray-800/70 px-3 py-2 text-xs text-gray-300 font-medium border-b border-gray-700">
-                    📊 1 час
-                  </div>
-                  <TradingViewChart
-                    candles={[]} // Пока пустые данные, потом подключим реальные
-                    symbol="BTCUSDT"
-                    timeframe="1h"
-                    width="100%"
-                    height={200}
-                  />
-                </div>
-                
-                {/* 1d Chart */}
-                <div className="bg-black rounded-lg border border-gray-600 overflow-hidden">
-                  <div className="bg-gray-800/70 px-3 py-2 text-xs text-gray-300 font-medium border-b border-gray-700">
-                    📊 1 день
-                  </div>
-                  <TradingViewChart
-                    candles={[]} // Пока пустые данные, потом подключим реальные
-                    symbol="BTCUSDT"
-                    timeframe="1d"
-                    width="100%"
-                    height={200}
-                  />
-                </div>
+                {btcTimeframes.map((timeframe, index) => {
+                  // Получаем свечи для данного таймфрейма
+                  const timeframeCandles = (btcData.candles || []).filter(candle => 
+                    candle.timeframe === timeframe
+                  );
+                  
+                  const timeframeLabels = {
+                    '1m': '1 мин',
+                    '5m': '5 мин', 
+                    '15m': '15 мин',
+                    '1h': '1 час',
+                    '4h': '4 часа',
+                    '1d': '1 день'
+                  };
+                  
+                  return (
+                    <div key={timeframe} className="bg-black rounded-lg border border-gray-600 overflow-hidden">
+                      <div className="bg-gray-800/70 px-3 py-2 text-xs text-gray-300 font-medium border-b border-gray-700">
+                        📊 {timeframeLabels[timeframe] || timeframe}
+                      </div>
+                      <TradingViewChart
+                        candles={timeframeCandles}
+                        symbol="BTCUSDT"
+                        timeframe={timeframe}
+                        width="100%"
+                        height={200}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
