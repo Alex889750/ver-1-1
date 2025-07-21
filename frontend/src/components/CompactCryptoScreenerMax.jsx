@@ -479,6 +479,25 @@ const CompactCryptoScreenerMax = () => {
       />
 
       <div className="max-w-full mx-auto">
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">
+            MEXC TradingView Screener
+            <span className="text-blue-400 text-xl ml-2">Pro Max</span>
+          </h1>
+          <div className="flex justify-center items-center space-x-3">
+            <Badge variant="secondary" className="px-3 py-1 text-xs">
+              📊 Максимальная сортировка
+            </Badge>
+            <Badge variant="outline" className="px-3 py-1 text-xs border-blue-500 text-blue-400">
+              По модулю |%|
+            </Badge>
+            <span className="text-gray-400 text-sm">
+              {lastUpdate.toLocaleTimeString()}
+            </span>
+          </div>
+        </div>
+
         {/* Error Message */}
         {error && (
           <div className="mb-4">
