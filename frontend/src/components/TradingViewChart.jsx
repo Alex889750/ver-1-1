@@ -121,11 +121,23 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
         
         {/* Candles */}
         {validCandles.map((candle, index) => {
+          // Валидация данных свечи
+          if (!candle || typeof candle.open !== 'number' || typeof candle.close !== 'number' ||
+              typeof candle.high !== 'number' || typeof candle.low !== 'number' ||
+              isNaN(candle.open) || isNaN(candle.close) || isNaN(candle.high) || isNaN(candle.low)) {
+            return null; // Пропускаем невалидные свечи
+          }
+          
           const x = chartPadding + index * candleSpacing + candleSpacing / 2;
           const openY = priceToY(candle.open);
           const closeY = priceToY(candle.close);
           const highY = priceToY(candle.high);
           const lowY = priceToY(candle.low);
+          
+          // Дополнительная валидация координат
+          if (isNaN(x) || isNaN(openY) || isNaN(closeY) || isNaN(highY) || isNaN(lowY)) {
+            return null;
+          }
           
           const isGreen = candle.close >= candle.open;
           const color = isGreen ? '#10b981' : '#ef4444'; // green-500 : red-500
@@ -161,7 +173,7 @@ const TradingViewChart = ({ candles = [], symbol = '', timeframe = '30s', width 
               />
             </g>
           );
-        })}
+        }).filter(Boolean)}
         
         {/* Price labels */}
         <text
